@@ -30,6 +30,7 @@
 
 #include "sys.h"
 #include "delay.h"
+#include "stm32f4xx_hal.h"
 
 
 static uint32_t g_fac_us = 0;       /* us延时倍乘数 */
@@ -186,20 +187,23 @@ void delay_us(uint32_t nus)
  */
 void delay_ms(uint16_t nms)
 {
-    
-#if SYS_SUPPORT_OS  /* 如果需要支持OS, 则根据情况调用os延时以释放CPU */
-    if (delay_osrunning && delay_osintnesting == 0)     /* 如果OS已经在跑了,并且不是在中断里面(中断里面不能任务调度) */
+#if SYS_SUPPORT_OS
+    if (delay_osrunning && delay_osintnesting == 0)
     {
-        if (nms >= g_fac_ms)                            /* 延时的时间大于OS的最少时间周期 */
+        if (nms >= g_fac_ms)
         {
-            delay_ostimedly(nms / g_fac_ms);            /* OS延时 */
+            delay_ostimedly(nms / g_fac_ms);
         }
-
-        nms %= g_fac_ms;                                /* OS已经无法提供这么小的延时了,采用普通方式延时 */
+        nms %= g_fac_ms;
     }
+    /* 剩余不足一个OS节拍的时间，退回到忙等方案 */
+    uint32_t start_tick = HAL_GetTick();
+    while ((HAL_GetTick() - start_tick) < nms) { /* busy-wait */ }
+#else
+    /* 非OS：用 HAL 时间基（可能是 TIM4）实现毫秒延时 */
+    uint32_t start_tick = HAL_GetTick();
+    while ((HAL_GetTick() - start_tick) < nms) { /* busy-wait */ }
 #endif
-
-    delay_us((uint32_t)(nms * 1000));                   /* 普通方式延时 */
 }
 
 /**
@@ -210,7 +214,9 @@ void delay_ms(uint16_t nms)
  */
 void HAL_Delay(uint32_t Delay)
 {
-     delay_ms(Delay);
+    /* 使用 HAL 的时间基（TIM4）实现毫秒级延时，避免对 SysTick 的依赖 */
+    uint32_t start = HAL_GetTick();
+    while ((HAL_GetTick() - start) < Delay) { /* busy-wait */ }
 }
 
 

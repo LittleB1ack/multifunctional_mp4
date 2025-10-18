@@ -59,13 +59,7 @@ static QueueHandle_t ledQueue;  /* 全局队列，用于 LVGL -> LED 任务传输状态 */
 
 /* USER CODE END Variables */
 
-/* Definitions for defaultTask */
-osThreadId_t defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
-};
+
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */

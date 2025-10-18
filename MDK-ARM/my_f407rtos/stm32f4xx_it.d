@@ -67,5 +67,7 @@ my_f407rtos\stm32f4xx_it.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb
 my_f407rtos\stm32f4xx_it.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h
 my_f407rtos\stm32f4xx_it.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_hcd.h
 my_f407rtos\stm32f4xx_it.o: ../Core/Inc/stm32f4xx_it.h
+my_f407rtos\stm32f4xx_it.o: ../Core/Inc/sdio.h
+my_f407rtos\stm32f4xx_it.o: ../Core/Inc/dma.h
 my_f407rtos\stm32f4xx_it.o: ../Drivers/BSP_Driver/TOUCH/bsp_i2c_touch.h
 my_f407rtos\stm32f4xx_it.o: ../Drivers/BSP_Driver/TOUCH/gt9xx.h

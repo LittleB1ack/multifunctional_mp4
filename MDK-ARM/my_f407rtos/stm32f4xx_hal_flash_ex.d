@@ -1,4 +1,4 @@
-my_f407rtos\stm32f4xx_hal_flash_ex.o: ../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c
+my_f407rtos\stm32f4xx_hal_flash_ex.o: ..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_flash_ex.c
 my_f407rtos\stm32f4xx_hal_flash_ex.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h
 my_f407rtos\stm32f4xx_hal_flash_ex.o: ../Core/Inc/stm32f4xx_hal_conf.h
 my_f407rtos\stm32f4xx_hal_flash_ex.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h

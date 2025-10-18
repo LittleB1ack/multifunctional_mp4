@@ -37,3 +37,22 @@ void vApplicationTickHook( void )	//
 **优化空间**
 
 1. 暂无
+
+## **--修复SDIO初始化与中断**  10-19
+
+**已完成工作**
+
+1. 在 `sdio.c` 中调用 `HAL_SD_Init` 并配置 4-bit 总线，若失败则回退到 1-bit；为 SDIO 引脚启用上拉电阻。
+2. 配置 DMA 时钟并启用 NVIC 中断，确保 SDIO RX/TX 流正常工作。
+3. 在 `stm32f4xx_it.c` 中添加 `SDIO_IRQHandler`、`DMA2_Stream3_IRQHandler` 和 `DMA2_Stream6_IRQHandler`。
+4. 在 `main.c` 中调整初始化顺序，确保 DMA 在 SDIO 之前初始化。
+5. 更新 `bsp_sdio.c` 中的日志打印，确保输出纯 ASCII 并添加错误码。
+
+**待解决问题**
+1. 测试 SD 卡初始化是否成功，观察串口日志是否正确打印卡信息。
+2. 验证读写操作是否正常，确保文件系统稳定运行。
+3. 进行FatFS文件系统的移植，实现文件读取写入功能
+
+**优化空间**
+
+1. 暂无

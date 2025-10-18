@@ -1,0 +1,247 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file    sdio.c
+  * @brief   This file provides code for the configuration
+  *          of the SDIO instances.
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2025 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
+#include "sdio.h"
+#include "string.h"
+#include "stdio.h"
+/* USER CODE BEGIN 0 */
+
+
+/* USER CODE END 0 */
+
+SD_HandleTypeDef hsd;
+DMA_HandleTypeDef hdma_sdio_rx;
+DMA_HandleTypeDef hdma_sdio_tx;
+
+/* SDIO init function */
+
+void MX_SDIO_SD_Init(void)
+{
+  printf("[SD] MX_SDIO_SD_Init: begin\r\n");
+
+  /* USER CODE BEGIN SDIO_Init 0 */
+
+  /* USER CODE END SDIO_Init 0 */
+
+  /* USER CODE BEGIN SDIO_Init 1 */
+
+  /* USER CODE END SDIO_Init 1 */
+  hsd.Instance = SDIO;
+  hsd.Init.ClockEdge = SDIO_CLOCK_EDGE_RISING;
+  hsd.Init.ClockBypass = SDIO_CLOCK_BYPASS_DISABLE;
+  hsd.Init.ClockPowerSave = SDIO_CLOCK_POWER_SAVE_DISABLE;
+  hsd.Init.BusWide = SDIO_BUS_WIDE_4B;
+  hsd.Init.HardwareFlowControl = SDIO_HARDWARE_FLOW_CONTROL_DISABLE;
+  /* SD spec: power-up init should be <= 400kHz, with SDIOCLK=48MHz => div ~ 118 */
+  /* 上电初始化阶段使用低速（~400kHz）：48MHz/(118+2)=~400kHz */
+  hsd.Init.ClockDiv = 7;
+  /* USER CODE BEGIN SDIO_Init 2 */
+  printf("[SD] MX_SDIO_SD_Init: ClockDiv=%lu, BusWide=%u, FlowCtrl=%u\r\n",
+    (unsigned long)hsd.Init.ClockDiv,
+    (unsigned int)hsd.Init.BusWide,
+    (unsigned int)hsd.Init.HardwareFlowControl);
+
+  /* USER CODE END SDIO_Init 2 */
+  /* 完成卡上电初始化 */
+//  if (HAL_SD_Init(&hsd) != HAL_OK)
+//  {
+//    Error_Handler();
+//  }
+
+//  /* 切换到 4-bit 总线（若布线质量有限，可保持 1-bit） */
+//  if (HAL_SD_ConfigWideBusOperation(&hsd, SDIO_BUS_WIDE_4B) != HAL_OK)
+//  {
+//    /* Fallback to 1-bit if 4-bit not available */
+//    if (HAL_SD_ConfigWideBusOperation(&hsd, SDIO_BUS_WIDE_1B) != HAL_OK)
+//    {
+//      Error_Handler();
+//    }
+//  }
+
+}
+
+void HAL_SD_MspInit(SD_HandleTypeDef* sdHandle)
+{
+
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  if(sdHandle->Instance==SDIO)
+  {
+  printf("[SD] HAL_SD_MspInit: enter\r\n");
+  /* USER CODE BEGIN SDIO_MspInit 0 */
+
+  /* USER CODE END SDIO_MspInit 0 */
+  /* SDIO clock enable */
+  __HAL_RCC_SDIO_CLK_ENABLE();
+  printf("[SD] HAL_SD_MspInit: SDIO clock enabled\r\n");
+
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+    __HAL_RCC_GPIOD_CLK_ENABLE();
+    /**SDIO GPIO Configuration
+    PC8     ------> SDIO_D0
+    PC9     ------> SDIO_D1
+    PC10     ------> SDIO_D2
+    PC11     ------> SDIO_D3
+    PC12     ------> SDIO_CK
+    PD2     ------> SDIO_CMD
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11
+                          |GPIO_PIN_12;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP; /* 保守：使用内部上拉，避免无外拉时信号悬空 */
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF12_SDIO;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+  printf("[SD] HAL_SD_MspInit: GPIOC inited\r\n");
+
+    GPIO_InitStruct.Pin = GPIO_PIN_2;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP; /* 保守：使用内部上拉 */
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF12_SDIO;
+    HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+  printf("[SD] HAL_SD_MspInit: GPIOD inited\r\n");
+
+    /* SDIO DMA Init */
+    /* SDIO_RX Init */
+    hdma_sdio_rx.Instance = DMA2_Stream3;
+    hdma_sdio_rx.Init.Channel = DMA_CHANNEL_4;
+    hdma_sdio_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_sdio_rx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_sdio_rx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_sdio_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    hdma_sdio_rx.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+    hdma_sdio_rx.Init.Mode = DMA_PFCTRL;
+    hdma_sdio_rx.Init.Priority = DMA_PRIORITY_HIGH;
+    hdma_sdio_rx.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
+    hdma_sdio_rx.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
+    hdma_sdio_rx.Init.MemBurst = DMA_MBURST_INC4;
+    hdma_sdio_rx.Init.PeriphBurst = DMA_PBURST_INC4;
+    if (HAL_DMA_Init(&hdma_sdio_rx) != HAL_OK)
+    {
+      Error_Handler();
+    }
+    printf("[SD] HAL_SD_MspInit: DMA RX inited\r\n");
+
+    __HAL_LINKDMA(sdHandle,hdmarx,hdma_sdio_rx);
+
+    /* SDIO_TX Init */
+    hdma_sdio_tx.Instance = DMA2_Stream6;
+    hdma_sdio_tx.Init.Channel = DMA_CHANNEL_4;
+    hdma_sdio_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
+    hdma_sdio_tx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_sdio_tx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_sdio_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    hdma_sdio_tx.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+    hdma_sdio_tx.Init.Mode = DMA_PFCTRL;
+    hdma_sdio_tx.Init.Priority = DMA_PRIORITY_HIGH;
+    hdma_sdio_tx.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
+    hdma_sdio_tx.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
+    hdma_sdio_tx.Init.MemBurst = DMA_MBURST_INC4;
+    hdma_sdio_tx.Init.PeriphBurst = DMA_PBURST_INC4;
+    if (HAL_DMA_Init(&hdma_sdio_tx) != HAL_OK)
+    {
+      Error_Handler();
+    }
+    printf("[SD] HAL_SD_MspInit: DMA TX inited\r\n");
+
+    __HAL_LINKDMA(sdHandle,hdmatx,hdma_sdio_tx);
+
+    /* SDIO interrupt Init */
+    HAL_NVIC_SetPriority(SDIO_IRQn, 6, 0);
+    HAL_NVIC_EnableIRQ(SDIO_IRQn);
+  printf("[SD] HAL_SD_MspInit: NVIC SDIO enabled\r\n");
+  /* USER CODE BEGIN SDIO_MspInit 1 */
+  /* Diagnostic: if you suspect signal reliability issues you can force 1-bit
+    mode here by calling HAL_SD_ConfigWideBusOperation(&hsd, SDIO_BUS_WIDE_1B);
+    Keep this in USER CODE so it won't be overwritten by CubeMX. */
+
+  /* USER CODE END SDIO_MspInit 1 */
+  }
+}
+
+void HAL_SD_MspDeInit(SD_HandleTypeDef* sdHandle)
+{
+
+  if(sdHandle->Instance==SDIO)
+  {
+  /* USER CODE BEGIN SDIO_MspDeInit 0 */
+
+  /* USER CODE END SDIO_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_SDIO_CLK_DISABLE();
+
+    /**SDIO GPIO Configuration
+    PC8     ------> SDIO_D0
+    PC9     ------> SDIO_D1
+    PC10     ------> SDIO_D2
+    PC11     ------> SDIO_D3
+    PC12     ------> SDIO_CK
+    PD2     ------> SDIO_CMD
+    */
+    HAL_GPIO_DeInit(GPIOC, GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11
+                          |GPIO_PIN_12);
+
+    HAL_GPIO_DeInit(GPIOD, GPIO_PIN_2);
+
+    /* SDIO DMA DeInit */
+    HAL_DMA_DeInit(sdHandle->hdmarx);
+    HAL_DMA_DeInit(sdHandle->hdmatx);
+
+    /* SDIO interrupt Deinit */
+    HAL_NVIC_DisableIRQ(SDIO_IRQn);
+  /* USER CODE BEGIN SDIO_MspDeInit 1 */
+
+  /* USER CODE END SDIO_MspDeInit 1 */
+  }
+}
+
+
+/* USER CODE BEGIN 1 */
+
+/* 高层接口已迁移到 BSP（Drivers/BSP_Driver/bsp_sdio）
+   此处仅保留底层驱动与初始化/硬件抽象（MSP）函数。 */
+
+/* 可保留一个用于获取卡信息的简单封装，供其他底层模块使用 */
+HAL_StatusTypeDef SD_GetCardInfo(HAL_SD_CardInfoTypeDef *cardinfo)
+{
+    if (cardinfo == NULL) return HAL_ERROR;
+    HAL_SD_GetCardInfo(&hsd, cardinfo);
+    return HAL_OK;
+}
+
+/* 与 FreeRTOS_FATFS 保持一致的兼容初始化函数（如另处调用该名） */
+void MX_SDIO_SD_Init_Fix(void)
+{
+  hsd.Instance = SDIO;
+  hsd.Init.ClockEdge = SDIO_CLOCK_EDGE_RISING;
+  hsd.Init.ClockBypass = SDIO_CLOCK_BYPASS_DISABLE;
+  hsd.Init.ClockPowerSave = SDIO_CLOCK_POWER_SAVE_DISABLE;
+  hsd.Init.BusWide = SDIO_BUS_WIDE_1B;
+  hsd.Init.HardwareFlowControl = SDIO_HARDWARE_FLOW_CONTROL_DISABLE;
+  hsd.Init.ClockDiv = 4;
+}
+
+
+
+
+
+
+
+

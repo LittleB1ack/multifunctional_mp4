@@ -20,15 +20,24 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "gpio.h"
+#include "dma.h"
+#include "sdio.h"
+#include <stdio.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
+
+/* 包含系统相关头文件 */
 #include "sys.h"
 #include "usart.h"
 #include "delay.h"
 #include "led.h"
 #include "bsp_nt35510_lcd.h"
 #include "bsp_debug_usart.h"
+#include "./bsp_sdio/bsp_sdio.h"
+
+/* LVGL 相关头文件 */
 #include "lvgl.h"
 #include "lv_port_disp_template.h"
 #include "lv_port_indev_template.h"
@@ -90,15 +99,29 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-    sys_stm32_clock_init(336, 8, 2, 7); /* 设置时钟, 168Mhz */
-    delay_init(168);                    /* 延时初始化 */
-	DEBUG_USART_Config();		
-
+  /* 避免二次配置时钟引起的不确定行为，先暂停自定义时钟初始化 */
+  // sys_stm32_clock_init(336, 8, 2, 7);
+	DEBUG_USART_Config();               /* 先初始化串口，保证后续日志可见 */
+  printf("[BOOT] USART ready\r\n");
+  delay_init(168);                    /* 延时初始化（基于 168MHz） */
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  printf("[BOOT] GPIO init done\r\n");
+	
+	
+	
   /* USER CODE BEGIN 2 */
+  printf("[BOOT] Init SD begin\r\n");
+  /* 确保先完成 HAL_SD 初始化（与 FreeRTOS_FATFS 一致的流程） */
+  if(BSP_SD_Init() != HAL_OK) {
+    printf("[APP] BSP_SD_Init failed, abort SD tests\r\n");
+  } else {
+    printf("[APP] BSP_SD_Init ok\r\n");
+    BSP_SD_PrintCardInfo();           /* 打印 SD 卡信息 */
+    BSP_SD_Test(0);                 /* 可选：做一次读写自检 */
+  }
 
   /* USER CODE END 2 */
 
@@ -144,10 +167,11 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  /* HSI 16MHz: VCO = 16/8*168 = 336MHz, SYSCLK=168MHz, PLLQ=336/7=48MHz */
   RCC_OscInitStruct.PLL.PLLM = 8;
   RCC_OscInitStruct.PLL.PLLN = 168;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-  RCC_OscInitStruct.PLL.PLLQ = 4;
+  RCC_OscInitStruct.PLL.PLLQ = 7;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -174,23 +198,17 @@ void SystemClock_Config(void)
 
 /**
   * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM4 interrupt took place, inside
-  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
-  * a global variable "uwTick" used as application time base.
+  * @note   This function is called when TIM4 interrupt took place, inside
+  *         HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  *         a global variable used as application time base.
   * @param  htim : TIM handle
   * @retval None
   */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-  /* USER CODE BEGIN Callback 0 */
-
-  /* USER CODE END Callback 0 */
   if (htim->Instance == TIM4) {
     HAL_IncTick();
   }
-  /* USER CODE BEGIN Callback 1 */
-
-  /* USER CODE END Callback 1 */
 }
 
 /**
@@ -200,6 +218,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
+	
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
   while (1)
