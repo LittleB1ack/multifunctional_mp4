@@ -47,11 +47,11 @@ void MX_SDIO_SD_Init(void)
   hsd.Init.ClockEdge = SDIO_CLOCK_EDGE_RISING;
   hsd.Init.ClockBypass = SDIO_CLOCK_BYPASS_DISABLE;
   hsd.Init.ClockPowerSave = SDIO_CLOCK_POWER_SAVE_DISABLE;
-  hsd.Init.BusWide = SDIO_BUS_WIDE_4B;
+  hsd.Init.BusWide = SDIO_BUS_WIDE_1B;
   hsd.Init.HardwareFlowControl = SDIO_HARDWARE_FLOW_CONTROL_DISABLE;
   /* SD spec: power-up init should be <= 400kHz, with SDIOCLK=48MHz => div ~ 118 */
   /* 上电初始化阶段使用低速（~400kHz）：48MHz/(118+2)=~400kHz */
-  hsd.Init.ClockDiv = 7;
+  hsd.Init.ClockDiv = 118;
   /* USER CODE BEGIN SDIO_Init 2 */
   printf("[SD] MX_SDIO_SD_Init: ClockDiv=%lu, BusWide=%u, FlowCtrl=%u\r\n",
     (unsigned long)hsd.Init.ClockDiv,
@@ -166,7 +166,8 @@ void HAL_SD_MspInit(SD_HandleTypeDef* sdHandle)
     /* SDIO interrupt Init */
     HAL_NVIC_SetPriority(SDIO_IRQn, 6, 0);
     HAL_NVIC_EnableIRQ(SDIO_IRQn);
-  printf("[SD] HAL_SD_MspInit: NVIC SDIO enabled\r\n");
+
+    
   /* USER CODE BEGIN SDIO_MspInit 1 */
   /* Diagnostic: if you suspect signal reliability issues you can force 1-bit
     mode here by calling HAL_SD_ConfigWideBusOperation(&hsd, SDIO_BUS_WIDE_1B);
@@ -226,17 +227,7 @@ HAL_StatusTypeDef SD_GetCardInfo(HAL_SD_CardInfoTypeDef *cardinfo)
     return HAL_OK;
 }
 
-/* 与 FreeRTOS_FATFS 保持一致的兼容初始化函数（如另处调用该名） */
-void MX_SDIO_SD_Init_Fix(void)
-{
-  hsd.Instance = SDIO;
-  hsd.Init.ClockEdge = SDIO_CLOCK_EDGE_RISING;
-  hsd.Init.ClockBypass = SDIO_CLOCK_BYPASS_DISABLE;
-  hsd.Init.ClockPowerSave = SDIO_CLOCK_POWER_SAVE_DISABLE;
-  hsd.Init.BusWide = SDIO_BUS_WIDE_1B;
-  hsd.Init.HardwareFlowControl = SDIO_HARDWARE_FLOW_CONTROL_DISABLE;
-  hsd.Init.ClockDiv = 4;
-}
+
 
 
 

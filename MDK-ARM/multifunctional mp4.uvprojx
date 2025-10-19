@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F407xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../Drivers/BSP_Driver;../Middlewares;../Middlewares/LVGL/GUI;../Middlewares/LVGL/GUI/lvgl;../Middlewares/LVGL/GUI/lvgl/src;../Middlewares/LVGL/GUI/lvgl/examples/porting;../Drivers/BSP_Driver/LCD;../Drivers/BSP_Driver/TOUCH;../Drivers/SYSTEM;../Drivers/SYSTEM/delay;../Drivers/SYSTEM/sys;../Drivers/SYSTEM/usart;..\Middlewares\LVGL\GUI_APP\GUI_FONT;..\Middlewares\LVGL\GUI_APP;..\Drivers\BSP_Driver\flash;..\Drivers\BSP_Driver\font;..\Drivers\BSP_Driver;..\Drivers\BSP_Driver\lcd;..\Drivers\BSP_Driver\touch</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../Drivers/BSP_Driver;../Middlewares;../Middlewares/LVGL/GUI;../Middlewares/LVGL/GUI/lvgl;../Middlewares/LVGL/GUI/lvgl/src;../Middlewares/LVGL/GUI/lvgl/examples/porting;../Drivers/BSP_Driver/LCD;../Drivers/BSP_Driver/TOUCH;../Drivers/SYSTEM;../Drivers/SYSTEM/delay;../Drivers/SYSTEM/sys;../Drivers/SYSTEM/usart;..\Middlewares\LVGL\GUI_APP\GUI_FONT;..\Middlewares\LVGL\GUI_APP;..\Drivers\BSP_Driver\flash;..\Drivers\BSP_Driver\font;..\Drivers\BSP_Driver;..\Drivers\BSP_Driver\lcd;..\Drivers\BSP_Driver\touch;..\Middlewares\Third_Party\FatFs;..\Middlewares\Third_Party\FatFs\App;..\Middlewares\Third_Party\FatFs\src;..\Middlewares\Third_Party\FatFs\src\option;..\Middlewares\Third_Party\FatFs\Target</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -390,52 +390,12 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Application/User/Core</GroupName>
+          <GroupName>Drivers/CMSIS</GroupName>
           <Files>
             <File>
-              <FileName>main.c</FileName>
+              <FileName>system_stm32f4xx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Core/Src/main.c</FilePath>
-            </File>
-            <File>
-              <FileName>gpio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Core/Src/gpio.c</FilePath>
-            </File>
-            <File>
-              <FileName>freertos.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Core/Src/freertos.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_it.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Core/Src/stm32f4xx_it.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_hal_msp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Core/Src/stm32f4xx_hal_msp.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_hal_timebase_tim.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Core/Src/stm32f4xx_hal_timebase_tim.c</FilePath>
-            </File>
-            <File>
-              <FileName>dma.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Src\dma.c</FilePath>
-            </File>
-            <File>
-              <FileName>rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Src\rtc.c</FilePath>
-            </File>
-            <File>
-              <FileName>sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Src\sdio.c</FilePath>
+              <FilePath>../Core/Src/system_stm32f4xx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -895,12 +855,112 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Drivers/CMSIS</GroupName>
+          <GroupName>Drivers/SYSTEM</GroupName>
           <Files>
             <File>
-              <FileName>system_stm32f4xx.c</FileName>
+              <FileName>delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Core/Src/system_stm32f4xx.c</FilePath>
+              <FilePath>..\Drivers\SYSTEM\delay\delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>sys.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\SYSTEM\sys\sys.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>BSP_Driver</GroupName>
+          <Files>
+            <File>
+              <FileName>bsp_debug_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\BSP_Driver\bsp_debug_usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_i2c_touch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\BSP_Driver\touch\bsp_i2c_touch.c</FilePath>
+            </File>
+            <File>
+              <FileName>gt9xx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\BSP_Driver\touch\gt9xx.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_nt35510_lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\BSP_Driver\lcd\bsp_nt35510_lcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\BSP_Driver\bsp_sdio\bsp_sdio.c</FilePath>
+            </File>
+            <File>
+              <FileName>file_opera.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\BSP_Driver\sd\file_opera.c</FilePath>
+            </File>
+            <File>
+              <FileName>sd_opera.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\BSP_Driver\sd\sd_opera.c</FilePath>
+            </File>
+            <File>
+              <FileName>led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\BSP_Driver\led\led.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Application/User/Core</GroupName>
+          <Files>
+            <File>
+              <FileName>main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Core/Src/main.c</FilePath>
+            </File>
+            <File>
+              <FileName>gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Core/Src/gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>freertos.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Core/Src/freertos.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_it.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Core/Src/stm32f4xx_it.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_hal_msp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Core/Src/stm32f4xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_hal_timebase_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Core/Src/stm32f4xx_hal_timebase_tim.c</FilePath>
+            </File>
+            <File>
+              <FileName>dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\sdio.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -956,41 +1016,6 @@
               <FileName>port.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F/port.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>BSP_Driver</GroupName>
-          <Files>
-            <File>
-              <FileName>led.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Drivers\BSP_Driver\led.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_debug_usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Drivers\BSP_Driver\bsp_debug_usart.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_i2c_touch.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Drivers\BSP_Driver\touch\bsp_i2c_touch.c</FilePath>
-            </File>
-            <File>
-              <FileName>gt9xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Drivers\BSP_Driver\touch\gt9xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_nt35510_lcd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Drivers\BSP_Driver\lcd\bsp_nt35510_lcd.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Drivers\BSP_Driver\bsp_sdio\bsp_sdio.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1875,21 +1900,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Drivers/SYSTEM</GroupName>
-          <Files>
-            <File>
-              <FileName>delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Drivers\SYSTEM\delay\delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>sys.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Drivers\SYSTEM\sys\sys.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>Middlewares/LVGL/GUI_APP</GroupName>
         </Group>
         <Group>
@@ -1914,6 +1924,81 @@
               <FileName>lv_conf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Middlewares\LVGL\GUI\lvgl\lv_conf.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Mdriddlewares/FatFS/src</GroupName>
+          <Files>
+            <File>
+              <FileName>ff_gen_drv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\FatFs\src\ff_gen_drv.c</FilePath>
+            </File>
+            <File>
+              <FileName>diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\FatFs\src\diskio.c</FilePath>
+            </File>
+            <File>
+              <FileName>ff.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\FatFs\src\ff.c</FilePath>
+            </File>
+            <File>
+              <FileName>syscall.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\FatFs\src\option\syscall.c</FilePath>
+            </File>
+            <File>
+              <FileName>cc936.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\FatFs\src\option\cc936.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Mdriddlewares/FatFS/Target</GroupName>
+          <Files>
+            <File>
+              <FileName>ffconf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Middlewares\Third_Party\FatFs\Target\ffconf.h</FilePath>
+            </File>
+            <File>
+              <FileName>sd_diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\FatFs\Target\sd_diskio.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_driver_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\FatFs\Target\bsp_driver_sd.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Mdriddlewares/FatFS/APP</GroupName>
+          <Files>
+            <File>
+              <FileName>fatfs.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Middlewares\Third_Party\FatFs\App\fatfs.h</FilePath>
+            </File>
+            <File>
+              <FileName>fatfs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\FatFs\App\fatfs.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Mdriddlewares/FatFS/config</GroupName>
+          <Files>
+            <File>
+              <FileName>ffconf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Middlewares\Third_Party\FatFs\Target\ffconf.h</FilePath>
             </File>
           </Files>
         </Group>

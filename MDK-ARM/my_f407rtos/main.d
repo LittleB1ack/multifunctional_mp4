@@ -83,12 +83,13 @@ my_f407rtos\main.o: ../Core/Inc/sdio.h
 my_f407rtos\main.o: F:\Keli5 MDK\ARM\ARMCC\Bin\..\include\stdio.h
 my_f407rtos\main.o: ../Drivers/SYSTEM/sys/sys.h
 my_f407rtos\main.o: ../Drivers/CMSIS/Include/core_cm4.h
+my_f407rtos\main.o: ../Core/Inc/rtc.h
 my_f407rtos\main.o: ../Drivers/SYSTEM/usart/usart.h
 my_f407rtos\main.o: ../Drivers/SYSTEM/delay/delay.h
-my_f407rtos\main.o: ../Drivers/BSP_Driver/led.h
+my_f407rtos\main.o: ../Drivers/BSP_Driver/./led/led.h
 my_f407rtos\main.o: ../Drivers/BSP_Driver/LCD/bsp_nt35510_lcd.h
 my_f407rtos\main.o: ../Drivers/BSP_Driver/bsp_debug_usart.h
-my_f407rtos\main.o: ../Drivers/BSP_Driver/./bsp_sdio/bsp_sdio.h
+my_f407rtos\main.o: ../Core/Src/../../Middlewares/Third_Party/FatFs/Target/bsp_driver_sd.h
 my_f407rtos\main.o: ../Middlewares/LVGL/GUI/lvgl/lvgl.h
 my_f407rtos\main.o: ../Middlewares/LVGL/GUI/lvgl/src/misc/lv_log.h
 my_f407rtos\main.o: ../Middlewares/LVGL/GUI/lvgl/src/misc/../lv_conf_internal.h

@@ -77,7 +77,7 @@ my_f407rtos\freertos.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex
 my_f407rtos\freertos.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_hcd.h
 my_f407rtos\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h
 my_f407rtos\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h
-my_f407rtos\freertos.o: ../Drivers/BSP_Driver/led.h
+my_f407rtos\freertos.o: ../Drivers/BSP_Driver/./led/led.h
 my_f407rtos\freertos.o: ../Middlewares/LVGL/GUI/lvgl/lvgl.h
 my_f407rtos\freertos.o: ../Middlewares/LVGL/GUI/lvgl/src/misc/lv_log.h
 my_f407rtos\freertos.o: ../Middlewares/LVGL/GUI/lvgl/src/misc/../lv_conf_internal.h
@@ -203,3 +203,11 @@ my_f407rtos\freertos.o: F:\Keli5 MDK\ARM\ARMCC\Bin\..\include\stdio.h
 my_f407rtos\freertos.o: ../Middlewares/LVGL/GUI/lvgl/examples/porting/lv_port_disp_template.h
 my_f407rtos\freertos.o: ../Middlewares/LVGL/GUI/lvgl/examples/porting/lv_port_indev_template.h
 my_f407rtos\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
+my_f407rtos\freertos.o: ..\Middlewares\Third_Party\FatFs\App\fatfs.h
+my_f407rtos\freertos.o: ..\Middlewares\Third_Party\FatFs\src\ff.h
+my_f407rtos\freertos.o: ..\Middlewares\Third_Party\FatFs\src\integer.h
+my_f407rtos\freertos.o: ..\Middlewares\Third_Party\FatFs\Target\ffconf.h
+my_f407rtos\freertos.o: ..\Middlewares\Third_Party\FatFs\Target\bsp_driver_sd.h
+my_f407rtos\freertos.o: ..\Middlewares\Third_Party\FatFs\src\ff_gen_drv.h
+my_f407rtos\freertos.o: ..\Middlewares\Third_Party\FatFs\src\diskio.h
+my_f407rtos\freertos.o: ..\Middlewares\Third_Party\FatFs\Target\sd_diskio.h

@@ -25,12 +25,15 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "led.h"
+#include "./led/led.h"
 #include "lvgl.h"
 #include "stdio.h"
+#include "string.h"
 #include "lv_port_disp_template.h"
 #include "lv_port_indev_template.h"
 #include "queue.h"
+#include "fatfs.h"
+#include "ff.h"
 
 
 #define scr_act_width() lv_obj_get_width(lv_scr_act())
@@ -65,6 +68,7 @@ static QueueHandle_t ledQueue;  /* 全局队列，用于 LVGL -> LED 任务传输状态 */
 /* USER CODE BEGIN FunctionPrototypes */
 void LVGL_Process(void* param);
 void LED_Process(void *params);
+void FS_Process(void *params);
 /* USER CODE END FunctionPrototypes */
  
 
@@ -107,6 +111,8 @@ void MX_FREERTOS_Init(void) {
 
   xTaskCreate(LED_Process,"LED_Task",128,NULL,osPriorityNormal,NULL);
   xTaskCreate(LVGL_Process,"LVGL_Task",512,NULL,osPriorityNormal,NULL);
+  /* FS 任务优先级低于 LVGL，避免抢占 UI 渲染 */
+  xTaskCreate(FS_Process, "FS_Task", 512, NULL, osPriorityLow, NULL);
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 
@@ -148,6 +154,7 @@ void LED_Process(void *params)
 void LVGL_Process(void* param)
 {
     lv_init();                    /* lvgl系统初始化 */ 
+
     lv_port_disp_init();          /* lvgl显示接口初始化,放在lv_init()的后面 */ 
     lv_port_indev_init();         /* lvgl输入接口初始化,放在lv_init()的后面 */ 
 	
@@ -180,6 +187,52 @@ void LVGL_Process(void* param)
 		vTaskDelay(5);
 		lv_timer_handler();
 	}
+}
+
+/* 文件系统任务：负责驱动链接、挂载与一次性读写验证 */
+void FS_Process(void *params)
+{
+  /* 若未在 main 调用过，可在任务中调用一次驱动链接（幂等） */
+  /* 稍等其他任务（如 LVGL）先完成初始化，减少竞争 */
+  vTaskDelay(pdMS_TO_TICKS(50));
+  MX_FATFS_Init();
+
+  FRESULT fr;
+  /* 立即挂载卷 */
+  fr = f_mount(&SDFatFS, SDPath, 1);
+  if (fr == FR_NO_FILESYSTEM) {
+    printf("[FS] No FS, mkfs...\r\n");
+    static BYTE workbuf[4096];
+    /* R0.12c 签名：f_mkfs(path, opt, au, work, len) */
+    fr = f_mkfs(SDPath, FM_FAT | FM_SFD, 0, workbuf, sizeof(workbuf));
+    if (fr == FR_OK) {
+      fr = f_mount(&SDFatFS, SDPath, 1);
+    }
+  }
+  if (fr == FR_OK) {
+    printf("[FS] mount OK on %s\r\n", SDPath);
+    /* 简单读写验证 */
+    FIL fp;
+    UINT bw = 0;
+    if (f_open(&fp, "0:/hello.txt", FA_WRITE | FA_CREATE_ALWAYS) == FR_OK) {
+      const char *msg = "Hello, FatFs + FreeRTOS!\r\n";
+      f_write(&fp, msg, (UINT)strlen(msg), &bw);
+      f_close(&fp);
+      printf("[FS] write %u bytes\r\n", bw);
+    }
+    if (f_open(&fp, "0:/hello.txt", FA_READ) == FR_OK) {
+      char buf[64] = {0};
+      UINT br = 0;
+      f_read(&fp, buf, sizeof(buf)-1, &br);
+      f_close(&fp);
+      printf("[FS] read %u bytes: %s\r\n", br, buf);
+    }
+  } else {
+    printf("[FS] mount failed: %d\r\n", fr);
+  }
+
+  /* 文件系统初始化任务完成后可自行删除 */
+  vTaskDelete(NULL);
 }
 /* USER CODE END Application */
 

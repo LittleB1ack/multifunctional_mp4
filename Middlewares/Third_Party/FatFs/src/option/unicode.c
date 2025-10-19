@@ -11,7 +11,9 @@
 #elif _CODE_PAGE == 950	/* Traditional Chinese Big5 */
 #include "cc950.c"
 #else					/* Single Byte Character-Set */
-#include "ccsbcs.c"
+/* Select the correct code page conversion table for _CODE_PAGE in ffconf.h */
+/* For Simplified Chinese (CP936), include cc936.c */
+#include "cc936.c"
 #endif
 
 #endif

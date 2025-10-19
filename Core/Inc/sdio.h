@@ -35,7 +35,6 @@ extern "C" {
 extern SD_HandleTypeDef hsd;
 
 /* USER CODE BEGIN Private defines */
-void MX_SDIO_SD_Init_Fix(void);
 
 /* USER CODE END Private defines */
 

@@ -30,12 +30,13 @@
 
 /* 包含系统相关头文件 */
 #include "sys.h"
+#include "rtc.h"
 #include "usart.h"
 #include "delay.h"
-#include "led.h"
+#include "./led/led.h"
 #include "bsp_nt35510_lcd.h"
 #include "bsp_debug_usart.h"
-#include "./bsp_sdio/bsp_sdio.h"
+#include "../../Middlewares/Third_Party/FatFs/Target/bsp_driver_sd.h"
 
 /* LVGL 相关头文件 */
 #include "lvgl.h"
@@ -99,9 +100,10 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-  /* 避免二次配置时钟引起的不确定行为，先暂停自定义时钟初始化 */
-  // sys_stm32_clock_init(336, 8, 2, 7);
+  MX_RTC_Init();                    /* 先初始化 RTC，保证后续日志可见 */
 	DEBUG_USART_Config();               /* 先初始化串口，保证后续日志可见 */
+  
+	printf("\r\n\r\n\r\n\r\n================[BOOT    START]================ \r\n");
   printf("[BOOT] USART ready\r\n");
   delay_init(168);                    /* 延时初始化（基于 168MHz） */
   /* USER CODE END SysInit */
@@ -113,14 +115,17 @@ int main(void)
 	
 	
   /* USER CODE BEGIN 2 */
+  /* 按 HAL 要求先初始化 DMA 与 SDIO（配置 hsd、打开 SDIO 时钟/DMA 时钟/中断），再调用 BSP_SD_Init */
+  MX_DMA_Init();
+  MX_SDIO_SD_Init();
   printf("[BOOT] Init SD begin\r\n");
   /* 确保先完成 HAL_SD 初始化（与 FreeRTOS_FATFS 一致的流程） */
-  if(BSP_SD_Init() != HAL_OK) {
+  if(BSP_SD_Init() != MSD_OK) {
     printf("[APP] BSP_SD_Init failed, abort SD tests\r\n");
   } else {
     printf("[APP] BSP_SD_Init ok\r\n");
     BSP_SD_PrintCardInfo();           /* 打印 SD 卡信息 */
-    BSP_SD_Test(0);                 /* 可选：做一次读写自检 */
+    BSP_SD_Test(1);                 /* 可选：做一次读写自检 */
   }
 
   /* USER CODE END 2 */

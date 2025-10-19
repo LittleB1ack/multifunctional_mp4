@@ -1,5 +1,5 @@
-my_f407rtos\led.o: ..\Drivers\BSP_Driver\led.c
-my_f407rtos\led.o: ..\Drivers\BSP_Driver\led.h
+my_f407rtos\led.o: ..\Drivers\BSP_Driver\led\led.c
+my_f407rtos\led.o: ../Drivers/BSP_Driver/./led/led.h
 my_f407rtos\led.o: ../Core/Inc/main.h
 my_f407rtos\led.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h
 my_f407rtos\led.o: ../Core/Inc/stm32f4xx_hal_conf.h
