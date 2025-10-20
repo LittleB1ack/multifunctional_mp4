@@ -39,7 +39,7 @@ static void Delay(__IO uint32_t nCount)	 //简单的延时函数
   * @param  无
   * @retval 无
   */
-void I2C_GTP_IRQEnable(void)
+void TOUCH_I2C_GTP_IRQEnable(void)
 {
   GPIO_InitTypeDef GPIO_InitStructure; 
   /*选择要控制的GPIO引脚*/															   
@@ -63,7 +63,7 @@ void I2C_GTP_IRQEnable(void)
   * @param  无
   * @retval 无
   */
-void I2C_GTP_IRQDisable(void)
+void TOUCH_I2C_GTP_IRQDisable(void)
 {
   GPIO_InitTypeDef GPIO_InitStructure;
   /*选择要控制的GPIO引脚*/															   
@@ -131,7 +131,7 @@ static void I2C_GPIO_Config(void)
   * @param  无
   * @retval 无
   */
-void I2C_ResetChip(void)
+void TOUCH_I2C_ResetChip(void)
 {
   GPIO_InitTypeDef GPIO_InitStructure;
   /*选择要控制的GPIO引脚*/															   
@@ -167,13 +167,13 @@ void I2C_ResetChip(void)
   * @param  无
   * @retval 无
   */
-void I2C_Touch_Init(void)
+void TOUCH_I2C_Init(void)
 {
   I2C_GPIO_Config(); 
  
-  I2C_ResetChip();
+  TOUCH_I2C_ResetChip();
 
-  I2C_GTP_IRQEnable();
+  TOUCH_I2C_GTP_IRQEnable();
 }
 /*
 *********************************************************************************************************
@@ -183,7 +183,7 @@ void I2C_Touch_Init(void)
 *	返 回 值: 无
 *********************************************************************************************************
 */
-static void i2c_Delay(void)
+static void touch_i2c_Delay(void)
 {
 	uint8_t i;
 
@@ -206,16 +206,16 @@ static void i2c_Delay(void)
 *	返 回 值: 无
 *********************************************************************************************************
 */
-void i2c_Start(void)
+void touch_i2c_Start(void)
 {
 	/* 当SCL高电平时，SDA出现一个下跳沿表示I2C总线启动信号 */
 	I2C_SDA_1();
 	I2C_SCL_1();
-	i2c_Delay();
+	touch_i2c_Delay();
 	I2C_SDA_0();
-	i2c_Delay();
+	touch_i2c_Delay();
 	I2C_SCL_0();
-	i2c_Delay();
+	touch_i2c_Delay();
 }
 
 /*
@@ -226,12 +226,12 @@ void i2c_Start(void)
 *	返 回 值: 无
 *********************************************************************************************************
 */
-void i2c_Stop(void)
+void touch_i2c_Stop(void)
 {
 	/* 当SCL高电平时，SDA出现一个上跳沿表示I2C总线停止信号 */
 	I2C_SDA_0();
 	I2C_SCL_1();
-	i2c_Delay();
+	touch_i2c_Delay();
 	I2C_SDA_1();
 }
 
@@ -243,7 +243,7 @@ void i2c_Stop(void)
 *	返 回 值: 无
 *********************************************************************************************************
 */
-void i2c_SendByte(uint8_t _ucByte)
+void touch_i2c_SendByte(uint8_t _ucByte)
 {
 	uint8_t i;
 
@@ -258,16 +258,16 @@ void i2c_SendByte(uint8_t _ucByte)
 		{
 			I2C_SDA_0();
 		}
-		i2c_Delay();
+		touch_i2c_Delay();
 		I2C_SCL_1();
-		i2c_Delay();	
+		touch_i2c_Delay();	
 		I2C_SCL_0();
 		if (i == 7)
 		{
 			 I2C_SDA_1(); // 释放总线
 		}
 		_ucByte <<= 1;	/* 左移一个bit */
-		i2c_Delay();
+		touch_i2c_Delay();
 	}
 }
 
@@ -279,7 +279,7 @@ void i2c_SendByte(uint8_t _ucByte)
 *	返 回 值: 读到的数据
 *********************************************************************************************************
 */
-uint8_t i2c_ReadByte(void)
+uint8_t touch_i2c_ReadByte(void)
 {
 	uint8_t i;
 	uint8_t value;
@@ -290,13 +290,13 @@ uint8_t i2c_ReadByte(void)
 	{
 		value <<= 1;
 		I2C_SCL_1();
-		i2c_Delay();
+		touch_i2c_Delay();
 		if (I2C_SDA_READ())
 		{
 			value++;
 		}
 		I2C_SCL_0();
-		i2c_Delay();
+		touch_i2c_Delay();
 	}
 	return value;
 }
@@ -309,14 +309,14 @@ uint8_t i2c_ReadByte(void)
 *	返 回 值: 返回0表示正确应答，1表示无器件响应
 *********************************************************************************************************
 */
-uint8_t i2c_WaitAck(void)
+uint8_t touch_i2c_WaitAck(void)
 {
 	uint8_t re;
 
 	I2C_SDA_1();	/* CPU释放SDA总线 */
-	i2c_Delay();
+	touch_i2c_Delay();
 	I2C_SCL_1();	/* CPU驱动SCL = 1, 此时器件会返回ACK应答 */
-	i2c_Delay();
+	touch_i2c_Delay();
 	if (I2C_SDA_READ())	/* CPU读取SDA口线状态 */
 	{
 		re = 1;
@@ -326,7 +326,7 @@ uint8_t i2c_WaitAck(void)
 		re = 0;
 	}
 	I2C_SCL_0();
-	i2c_Delay();
+	touch_i2c_Delay();
 	return re;
 }
 
@@ -338,14 +338,14 @@ uint8_t i2c_WaitAck(void)
 *	返 回 值: 无
 *********************************************************************************************************
 */
-void i2c_Ack(void)
+void touch_i2c_Ack(void)
 {
 	I2C_SDA_0();	/* CPU驱动SDA = 0 */
-	i2c_Delay();
+	touch_i2c_Delay();
 	I2C_SCL_1();	/* CPU产生1个时钟 */
-	i2c_Delay();
+	touch_i2c_Delay();
 	I2C_SCL_0();
-	i2c_Delay();
+	touch_i2c_Delay();
 	I2C_SDA_1();	/* CPU释放SDA总线 */
 }
 
@@ -357,14 +357,14 @@ void i2c_Ack(void)
 *	返 回 值: 无
 *********************************************************************************************************
 */
-void i2c_NAck(void)
+void touch_i2c_NAck(void)
 {
 	I2C_SDA_1();	/* CPU驱动SDA = 1 */
-	i2c_Delay();
+	touch_i2c_Delay();
 	I2C_SCL_1();	/* CPU产生1个时钟 */
-	i2c_Delay();
+	touch_i2c_Delay();
 	I2C_SCL_0();
-	i2c_Delay();	
+	touch_i2c_Delay();	
 }
 
 
@@ -379,14 +379,14 @@ void i2c_NAck(void)
   *		@arg NumByteToRead:读取的数据长度
   * @retval  无
   */
-uint32_t I2C_ReadBytes(uint8_t ClientAddr,uint8_t* pBuffer, uint16_t NumByteToRead)
+uint32_t TOUCH_I2C_ReadBytes(uint8_t ClientAddr,uint8_t* pBuffer, uint16_t NumByteToRead)
 {
 	/* 第1步：发起I2C总线启动信号 */
-	i2c_Start();
+	touch_i2c_Start();
 	/* 第2步：发起控制字节，高7bit是地址，bit0是读写控制位，0表示写，1表示读 */
-	i2c_SendByte(ClientAddr | I2C_DIR_RD);	/* 此处是读指令 */
+	touch_i2c_SendByte(ClientAddr | I2C_DIR_RD);	/* 此处是读指令 */
 	/* 第3步：等待ACK */
-	if (i2c_WaitAck() != 0)
+	if (touch_i2c_WaitAck() != 0)
 	{
 		goto cmd_fail;	/* 器件无应答 */
 	}
@@ -394,23 +394,23 @@ uint32_t I2C_ReadBytes(uint8_t ClientAddr,uint8_t* pBuffer, uint16_t NumByteToRe
   {
    if(NumByteToRead == 1)
     {
-			i2c_NAck();	/* 最后1个字节读完后，CPU产生NACK信号(驱动SDA = 1) */
+			touch_i2c_NAck();	/* 最后1个字节读完后，CPU产生NACK信号(驱动SDA = 1) */
       /* 发送I2C总线停止信号 */
-      i2c_Stop();
+      touch_i2c_Stop();
     }
-   *pBuffer = i2c_ReadByte();
+   *pBuffer = touch_i2c_ReadByte();
     /* 读指针自增 */
     pBuffer++; 
     /*计数器自减 */
     NumByteToRead--;
-    i2c_Ack();	/* 中间字节读完后，CPU产生ACK信号(驱动SDA = 0) */  
+    touch_i2c_Ack();	/* 中间字节读完后，CPU产生ACK信号(驱动SDA = 0) */  
   }
 	/* 发送I2C总线停止信号 */
-	i2c_Stop();
+	touch_i2c_Stop();
 	return 0;	/* 执行成功 */
 cmd_fail: /* 命令执行失败后，切记发送停止信号，避免影响I2C总线上其他设备 */
 	/* 发送I2C总线停止信号 */
-	i2c_Stop();
+	touch_i2c_Stop();
 	return 1;
 }
 /**
@@ -421,22 +421,22 @@ cmd_fail: /* 命令执行失败后，切记发送停止信号，避免影响I2C总线上其他设备 */
   *     @arg NumByteToWrite:写的字节数
   * @retval  无
   */
-uint32_t I2C_WriteBytes(uint8_t ClientAddr,uint8_t* pBuffer,  uint8_t NumByteToWrite)
+uint32_t TOUCH_I2C_WriteBytes(uint8_t ClientAddr,uint8_t* pBuffer,  uint8_t NumByteToWrite)
 {
 	uint16_t m;	
   /*　第0步：发停止信号，启动内部写操作　*/
-  i2c_Stop();
+  touch_i2c_Stop();
   /* 通过检查器件应答的方式，判断内部写操作是否完成, 一般小于 10ms 			
     CLK频率为200KHz时，查询次数为30次左右
   */
   for (m = 0; m < 1000; m++)
   {				
     /* 第1步：发起I2C总线启动信号 */
-    i2c_Start();
+    touch_i2c_Start();
     /* 第2步：发起控制字节，高7bit是地址，bit0是读写控制位，0表示写，1表示读 */
-    i2c_SendByte(ClientAddr | I2C_DIR_WR);	/* 此处是写指令 */
+    touch_i2c_SendByte(ClientAddr | I2C_DIR_WR);	/* 此处是写指令 */
     /* 第3步：发送一个时钟，判断器件是否正确应答 */
-    if (i2c_WaitAck() == 0)
+    if (touch_i2c_WaitAck() == 0)
     {
       break;
     }
@@ -448,20 +448,20 @@ uint32_t I2C_WriteBytes(uint8_t ClientAddr,uint8_t* pBuffer,  uint8_t NumByteToW
   while(NumByteToWrite--)
   {
   /* 第4步：开始写入数据 */
-  i2c_SendByte(*pBuffer);
+  touch_i2c_SendByte(*pBuffer);
   /* 第5步：检查ACK */
-  if (i2c_WaitAck() != 0)
+  if (touch_i2c_WaitAck() != 0)
   {
     goto cmd_fail;	/* 器件无应答 */
   }
       pBuffer++;	/* 地址增1 */		
   }
 	/* 命令执行成功，发送I2C总线停止信号 */
-	i2c_Stop();
+	touch_i2c_Stop();
 	return 0;
 cmd_fail: /* 命令执行失败后，切记发送停止信号，避免影响I2C总线上其他设备 */
 	/* 发送I2C总线停止信号 */
-	i2c_Stop();
+	touch_i2c_Stop();
 	return 1;
 }
 

@@ -211,3 +211,7 @@ my_f407rtos\freertos.o: ..\Middlewares\Third_Party\FatFs\Target\bsp_driver_sd.h
 my_f407rtos\freertos.o: ..\Middlewares\Third_Party\FatFs\src\ff_gen_drv.h
 my_f407rtos\freertos.o: ..\Middlewares\Third_Party\FatFs\src\diskio.h
 my_f407rtos\freertos.o: ..\Middlewares\Third_Party\FatFs\Target\sd_diskio.h
+my_f407rtos\freertos.o: ../Drivers/BSP_Driver/./wm8978/bsp_wm8978.h
+my_f407rtos\freertos.o: ..\Middlewares\Third_Party\mp3\APP\mp3Player.h
+my_f407rtos\freertos.o: F:\Keli5 MDK\ARM\ARMCC\Bin\..\include\inttypes.h
+my_f407rtos\freertos.o: F:\Keli5 MDK\ARM\ARMCC\Bin\..\include\math.h

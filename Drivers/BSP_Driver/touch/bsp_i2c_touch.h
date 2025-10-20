@@ -2,6 +2,7 @@
 #define	__I2C_TOUCH_H
 
 #include "stm32f4xx.h"
+#include <stdint.h>
 
 /*设定使用的电容屏IIC设备地址*/
 #define GTP_ADDRESS            0xBA
@@ -47,11 +48,11 @@
 #define I2C_SDA_READ()   HAL_GPIO_ReadPin(GTP_I2C_SDA_GPIO_PORT, GTP_I2C_SDA_PIN)	
 
 //函数接口
-void I2C_Touch_Init(void);
-uint32_t I2C_WriteBytes(uint8_t ClientAddr,uint8_t* pBuffer,  uint8_t NumByteToWrite);
-uint32_t I2C_ReadBytes(uint8_t ClientAddr,uint8_t* pBuffer, uint16_t NumByteToRead);
-void I2C_ResetChip(void);
-void I2C_GTP_IRQDisable(void);
-void I2C_GTP_IRQEnable(void);
+void TOUCH_I2C_Init(void);
+uint32_t TOUCH_I2C_WriteBytes(uint8_t ClientAddr,uint8_t* pBuffer,  uint8_t NumByteToWrite);
+uint32_t TOUCH_I2C_ReadBytes(uint8_t ClientAddr,uint8_t* pBuffer, uint16_t NumByteToRead);
+void TOUCH_I2C_ResetChip(void);
+void TOUCH_I2C_GTP_IRQDisable(void);
+void TOUCH_I2C_GTP_IRQEnable(void);
 
 #endif /* __I2C_TOUCH_H */

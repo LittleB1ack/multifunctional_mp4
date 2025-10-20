@@ -100,7 +100,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-  MX_RTC_Init();                    /* 先初始化 RTC，保证后续日志可见 */
+
 	DEBUG_USART_Config();               /* 先初始化串口，保证后续日志可见 */
   
 	printf("\r\n\r\n\r\n\r\n================[BOOT    START]================ \r\n");

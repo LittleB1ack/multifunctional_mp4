@@ -215,10 +215,10 @@ static int I2C_Transfer( struct i2c_msg *msgs,int num)
 	{
 		if ((msgs[im].flags&I2C_M_RD))																//根据flag判断是读数据还是写数据
 		{
-			ret = I2C_ReadBytes(msgs[im].addr, msgs[im].buf, msgs[im].len);		//IIC读取数据
+			ret = TOUCH_I2C_ReadBytes(msgs[im].addr, msgs[im].buf, msgs[im].len);		//IIC读取数据
 		} else
 		{
-			ret = I2C_WriteBytes(msgs[im].addr,  msgs[im].buf, msgs[im].len);	//IIC写入数据
+			ret = TOUCH_I2C_WriteBytes(msgs[im].addr,  msgs[im].buf, msgs[im].len);	//IIC写入数据
 		}
 	}
 
@@ -368,7 +368,7 @@ void GTP_IRQ_Disable(void)
 
     GTP_DEBUG_FUNC();
 
-    I2C_GTP_IRQDisable();
+    TOUCH_I2C_GTP_IRQDisable();
 }
 
 /**
@@ -380,7 +380,7 @@ void GTP_IRQ_Enable(void)
 {
     GTP_DEBUG_FUNC();
      
-	  I2C_GTP_IRQEnable();    
+	  TOUCH_I2C_GTP_IRQEnable();    
 }
 
 
@@ -606,7 +606,7 @@ exit_work_func:
 {
     GTP_DEBUG_FUNC();
 #if 1
-    I2C_ResetChip();
+    TOUCH_I2C_ResetChip();
     return 0;
 #else 		//软件复位
     int8_t ret = -1;
@@ -780,7 +780,7 @@ Output:
 
 		
 	
-    I2C_Touch_Init();
+    TOUCH_I2C_Init();
 
     ret = GTP_I2C_Test();
     if (ret < 0)
@@ -942,7 +942,7 @@ Output:
 #endif
 		
 	 /*使能中断，这样才能检测触摸数据*/
-		I2C_GTP_IRQEnable();
+		TOUCH_I2C_GTP_IRQEnable();
 	
     GTP_Get_Info();
 		

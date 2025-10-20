@@ -55,7 +55,7 @@
           <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
-          <ListingPath></ListingPath>
+          <ListingPath>C:\Users\24336\Documents\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
           <CreateBatchFile>0</CreateBatchFile>
@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F407xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../Drivers/BSP_Driver;../Middlewares;../Middlewares/LVGL/GUI;../Middlewares/LVGL/GUI/lvgl;../Middlewares/LVGL/GUI/lvgl/src;../Middlewares/LVGL/GUI/lvgl/examples/porting;../Drivers/BSP_Driver/LCD;../Drivers/BSP_Driver/TOUCH;../Drivers/SYSTEM;../Drivers/SYSTEM/delay;../Drivers/SYSTEM/sys;../Drivers/SYSTEM/usart;..\Middlewares\LVGL\GUI_APP\GUI_FONT;..\Middlewares\LVGL\GUI_APP;..\Drivers\BSP_Driver\flash;..\Drivers\BSP_Driver\font;..\Drivers\BSP_Driver;..\Drivers\BSP_Driver\lcd;..\Drivers\BSP_Driver\touch;..\Middlewares\Third_Party\FatFs;..\Middlewares\Third_Party\FatFs\App;..\Middlewares\Third_Party\FatFs\src;..\Middlewares\Third_Party\FatFs\src\option;..\Middlewares\Third_Party\FatFs\Target</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../Drivers/BSP_Driver;../Middlewares;../Middlewares/LVGL/GUI;../Middlewares/LVGL/GUI/lvgl;../Middlewares/LVGL/GUI/lvgl/src;../Middlewares/LVGL/GUI/lvgl/examples/porting;../Drivers/BSP_Driver/LCD;../Drivers/BSP_Driver/TOUCH;../Drivers/SYSTEM;../Drivers/SYSTEM/delay;../Drivers/SYSTEM/sys;../Drivers/SYSTEM/usart;..\Middlewares\LVGL\GUI_APP\GUI_FONT;..\Middlewares\LVGL\GUI_APP;..\Drivers\BSP_Driver\flash;..\Drivers\BSP_Driver\font;..\Drivers\BSP_Driver;..\Drivers\BSP_Driver\lcd;..\Drivers\BSP_Driver\touch;..\Middlewares\Third_Party\FatFs;..\Middlewares\Third_Party\FatFs\App;..\Middlewares\Third_Party\FatFs\src;..\Middlewares\Third_Party\FatFs\src\option;..\Middlewares\Third_Party\FatFs\Target;..\Middlewares\Third_Party\mp3;..\Middlewares\Third_Party\mp3\APP;..\Middlewares\Third_Party\mp3\pub;..\Middlewares\Third_Party\mp3\real;..\Middlewares\Third_Party\mp3\real\arm</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -911,6 +911,16 @@
               <FileName>led.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Drivers\BSP_Driver\led\led.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_i2c_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\BSP_Driver\wm8978\bsp_i2c_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_wm8978.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\BSP_Driver\wm8978\bsp_wm8978.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1999,6 +2009,101 @@
               <FileName>ffconf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Middlewares\Third_Party\FatFs\Target\ffconf.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Mdriddlewares/mp3/src</GroupName>
+          <Files>
+            <File>
+              <FileName>mp3tabs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\mp3\mp3tabs.c</FilePath>
+            </File>
+            <File>
+              <FileName>mp3dec.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\mp3\mp3dec.c</FilePath>
+            </File>
+            <File>
+              <FileName>subband.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\mp3\real\subband.c</FilePath>
+            </File>
+            <File>
+              <FileName>dequant.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\mp3\real\dequant.c</FilePath>
+            </File>
+            <File>
+              <FileName>buffers.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\mp3\real\buffers.c</FilePath>
+            </File>
+            <File>
+              <FileName>dct32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\mp3\real\dct32.c</FilePath>
+            </File>
+            <File>
+              <FileName>stproc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\mp3\real\stproc.c</FilePath>
+            </File>
+            <File>
+              <FileName>dqchan.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\mp3\real\dqchan.c</FilePath>
+            </File>
+            <File>
+              <FileName>scalfact.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\mp3\real\scalfact.c</FilePath>
+            </File>
+            <File>
+              <FileName>trigtabs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\mp3\real\trigtabs.c</FilePath>
+            </File>
+            <File>
+              <FileName>bitstream.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\mp3\real\bitstream.c</FilePath>
+            </File>
+            <File>
+              <FileName>huffman.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\mp3\real\huffman.c</FilePath>
+            </File>
+            <File>
+              <FileName>imdct.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\mp3\real\imdct.c</FilePath>
+            </File>
+            <File>
+              <FileName>hufftabs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\mp3\real\hufftabs.c</FilePath>
+            </File>
+            <File>
+              <FileName>asmmisc.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\Middlewares\Third_Party\mp3\real\arm\asmmisc.s</FilePath>
+            </File>
+            <File>
+              <FileName>asmpoly_thumb2.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\Middlewares\Third_Party\mp3\real\arm\asmpoly_thumb2.s</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Mdriddlewares/mp3/APP</GroupName>
+          <Files>
+            <File>
+              <FileName>mp3Player.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\mp3\APP\mp3Player.c</FilePath>
             </File>
           </Files>
         </Group>

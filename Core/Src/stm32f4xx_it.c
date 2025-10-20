@@ -22,6 +22,7 @@
 #include "stm32f4xx_it.h"
 #include "sdio.h"
 #include "dma.h"
+#include "./wm8978/bsp_wm8978.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -234,5 +235,13 @@ void GTP_IRQHandler(void)
 	}  
 	
 }
+
+
+void DMA1_Stream4_IRQHandler(void)
+   {
+       I2Sx_TX_DMA_STREAM_IRQFUN();
+   }
+
+
 
 /* USER CODE END 1 */

@@ -35,6 +35,11 @@
 #include "fatfs.h"
 #include "ff.h"
 
+/*audio driver and mp3 decoder*/
+#include "./wm8978/bsp_wm8978.h"
+#include "mp3Player.h"
+#include "math.h"
+
 
 #define scr_act_width() lv_obj_get_width(lv_scr_act())
 #define scr_act_height() lv_obj_get_height(lv_scr_act())
@@ -69,6 +74,7 @@ static QueueHandle_t ledQueue;  /* 全局队列，用于 LVGL -> LED 任务传输状态 */
 void LVGL_Process(void* param);
 void LED_Process(void *params);
 void FS_Process(void *params);
+void Audio_Test_Task(void *params);
 /* USER CODE END FunctionPrototypes */
  
 
@@ -109,10 +115,18 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_THREADS */
 
+
+  /* 创建 LED 任务 */
   xTaskCreate(LED_Process,"LED_Task",128,NULL,osPriorityNormal,NULL);
+  /* 创建 LVGL 任务 */
   xTaskCreate(LVGL_Process,"LVGL_Task",512,NULL,osPriorityNormal,NULL);
+
   /* FS 任务优先级低于 LVGL，避免抢占 UI 渲染 */
   xTaskCreate(FS_Process, "FS_Task", 512, NULL, osPriorityLow, NULL);
+  /* 创建音频测试任务 */
+  xTaskCreate(Audio_Test_Task, "AudioTest", 1024, NULL, 2, NULL);
+
+
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 
@@ -234,5 +248,98 @@ void FS_Process(void *params)
   /* 文件系统初始化任务完成后可自行删除 */
   vTaskDelete(NULL);
 }
+
+void Audio_Test_Task(void *params)
+{
+		printf("[AUDIO] ========================================\r\n");
+		printf("[AUDIO] I2S-DMA-WM8978 Test Started\r\n");
+		printf("[AUDIO] ========================================\r\n");
+		
+		// ============= Step 1: Reset WM8978 =============
+		printf("[AUDIO] Step 1: Resetting WM8978...\r\n");
+		wm8978_Reset();
+		vTaskDelay(pdMS_TO_TICKS(10));
+		printf("[AUDIO] ? WM8978 reset done\r\n");
+		
+		// ============= Step 2: Configure Audio Path =============
+		printf("[AUDIO] Step 2: Configuring audio path...\r\n");
+		wm8978_CfgAudioPath(DAC_ON, EAR_LEFT_ON | EAR_RIGHT_ON);
+		printf("[AUDIO] ? Audio path configured (DAC -> Headphones)\r\n");
+		
+		// ============= Step 3: Set Volume =============
+		printf("[AUDIO] Step 3: Setting volume...\r\n");
+		wm8978_SetOUT1Volume(45);  // 设置音量为 45 (0-63)
+		printf("[AUDIO] ? Volume set to 45\r\n");
+		
+		// ============= Step 4: Configure I2S Interface =============
+		printf("[AUDIO] Step 4: Configuring I2S interface...\r\n");
+		wm8978_CfgAudioIF(I2S_STANDARD_PHILIPS, 16);  // Philips 标准，16-bit
+		printf("[AUDIO] ? I2S interface configured\r\n");
+		
+		// ============= Step 5: Initialize I2S =============
+		printf("[AUDIO] Step 5: Initializing I2S and GPIO...\r\n");
+		I2S_Stop();
+		I2S_GPIO_Config();
+		printf("[AUDIO] ? I2S GPIO initialized\r\n");
+		
+		printf("[AUDIO] Step 6: Configuring I2S mode...\r\n");
+		I2Sx_Mode_Config(I2S_STANDARD_PHILIPS, I2S_DATAFORMAT_16B, I2S_AUDIOFREQ_44K);
+		printf("[AUDIO] ? I2S mode configured (44.1kHz)\r\n");
+		
+		// ============= Step 6: Generate Audio Buffers =============
+		printf("[AUDIO] Step 7: Generating audio buffers...\r\n");
+		
+		// 双缓冲，每个 1152 采样点 (44.1kHz 下 ~26ms)
+		static int16_t sine_buffer[2][1152];
+		
+		// 生成 1kHz 正弦波
+		float phase = 0.0f;
+		float phase_step = (2.0f * 3.14159265f * 1000.0f) / 44100.0f;  // 1000Hz
+		
+		for (int i = 0; i < 1152; i++) {
+				int16_t sample = (int16_t)(32000.0f * sinf(phase));
+				sine_buffer[0][i] = sample;
+				sine_buffer[1][i] = sample;
+				phase += phase_step;
+				if (phase > 2.0f * 3.14159265f) {
+						phase -= 2.0f * 3.14159265f;
+				}
+		}
+		printf("[AUDIO] ? Audio buffers generated (1kHz sine wave)\r\n");
+		
+		// ============= Step 7: Initialize DMA =============
+		printf("[AUDIO] Step 8: Initializing DMA transfer...\r\n");
+		I2Sx_TX_DMA_Init((uint32_t)&sine_buffer[0][0], 
+										 (uint32_t)&sine_buffer[1][0], 
+										 1152);
+		printf("[AUDIO] ? DMA initialized\r\n");
+		
+		// ============= Step 8: Start Playback =============
+		printf("[AUDIO] Step 9: Starting playback...\r\n");
+		I2S_Play_Start();
+		printf("[AUDIO] ? Playback started\r\n");
+		printf("[AUDIO] ========================================\r\n");
+		printf("[AUDIO] Playing 1kHz tone for 10 seconds...\r\n");
+		printf("[AUDIO] Please listen carefully!\r\n");
+		printf("[AUDIO] ========================================\r\n");
+		
+		// 播放 10 秒
+		vTaskDelay(pdMS_TO_TICKS(10000));
+		
+		// ============= Step 9: Stop Playback =============
+		printf("[AUDIO] ========================================\r\n");
+		printf("[AUDIO] Stopping playback...\r\n");
+		I2S_Play_Stop();
+		wm8978_OutMute(1);  // 关闭输出
+		printf("[AUDIO] ? Playback stopped\r\n");
+		printf("[AUDIO] ========================================\r\n");
+		printf("[AUDIO] Test completed!\r\n");
+		printf("[AUDIO] ========================================\r\n");
+		
+		// 删除任务
+		vTaskDelete(NULL);
+}
+
+
 /* USER CODE END Application */
 
