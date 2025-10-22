@@ -1,4 +1,5 @@
 my_f407rtos\system_stm32f4xx.o: ../Core/Src/system_stm32f4xx.c
+my_f407rtos\system_stm32f4xx.o: ../Drivers/BSP_Driver/./sdram/bsp_sdram.h
 my_f407rtos\system_stm32f4xx.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h
 my_f407rtos\system_stm32f4xx.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h
 my_f407rtos\system_stm32f4xx.o: ../Drivers/CMSIS/Include/core_cm4.h
@@ -65,3 +66,5 @@ my_f407rtos\system_stm32f4xx.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ha
 my_f407rtos\system_stm32f4xx.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h
 my_f407rtos\system_stm32f4xx.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h
 my_f407rtos\system_stm32f4xx.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_hcd.h
+my_f407rtos\system_stm32f4xx.o: ../Drivers/BSP_Driver/./usart/bsp_debug_usart.h
+my_f407rtos\system_stm32f4xx.o: F:\Keli5 MDK\ARM\ARMCC\Bin\..\include\stdio.h

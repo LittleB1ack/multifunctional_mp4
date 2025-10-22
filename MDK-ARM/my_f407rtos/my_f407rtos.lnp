@@ -103,6 +103,7 @@
 "my_f407rtos\led.o"
 "my_f407rtos\bsp_i2c_gpio.o"
 "my_f407rtos\bsp_wm8978.o"
+"my_f407rtos\bsp_sdram.o"
 "my_f407rtos\main.o"
 "my_f407rtos\gpio.o"
 "my_f407rtos\freertos.o"

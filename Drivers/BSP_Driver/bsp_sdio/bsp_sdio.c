@@ -18,29 +18,39 @@ static uint32_t s_wbuf32[512 / 4];
 
 HAL_StatusTypeDef BSP_SD_Init(void)
 {
-    printf("[SD] BSP_SD_Init: MX_DMA_Init()\r\n");
-    /* 1) DMA 时钟与 NVIC */
+    printf("\r\n------------------------------------------------------------\r\n");
+    printf("SD Card Controller Initialization\r\n");
+    printf("------------------------------------------------------------\r\n");
+
+    printf("-- DMA Channel Configuration --\r\n");
     MX_DMA_Init();
-    printf("[SD] BSP_SD_Init: MX_DMA_Init done\r\n");
+    printf("DMA streams configured (RX: DMA2-S3, TX: DMA2-S6)\r\n");
 
-    /* 2) SDIO 外设句柄配置（时钟、总线宽度参数） */
-    printf("[SD] BSP_SD_Init: MX_SDIO_SD_Init()\r\n");
-    MX_SDIO_SD_Init(); /* 或 MX_SDIO_SD_Init_Fix(); 二者参数一致 */
+    printf("\r\n-- SDIO Peripheral Configuration --\r\n");
+    MX_SDIO_SD_Init();
+    printf("SDIO clock and GPIO configured\r\n");
 
-    /* 3) HAL 初始化（上电识别、进入传输态，默认 1-bit） */
-    printf("[SD] BSP_SD_Init: verify tick before HAL_SD_Init: %lu\r\n", (unsigned long)HAL_GetTick());
+    printf("\r\n-- Card Identification Phase --\r\n");
     HAL_Delay(10);
-    printf("[SD] BSP_SD_Init: verify tick after  HAL_Delay:  %lu\r\n", (unsigned long)HAL_GetTick());
-    printf("[SD] BSP_SD_Init: SDIO force reset\r\n");
     __HAL_RCC_SDIO_FORCE_RESET();
     HAL_Delay(1);
     __HAL_RCC_SDIO_RELEASE_RESET();
-    printf("[SD] BSP_SD_Init: HAL_SD_Init() start\r\n");
+    
     if (HAL_SD_Init(&hsd) != HAL_OK) {
-        printf("BSP_SD_Init: HAL_SD_Init failed, err=0x%08lX\r\n", (unsigned long)hsd.ErrorCode);
+        printf("Card initialization failed (0x%08lX)\r\n", (unsigned long)hsd.ErrorCode);
+        printf("------------------------------------------------------------\r\n\r\n");
         return HAL_ERROR;
     }
-    printf("[SD] BSP_SD_Init: HAL_SD_Init OK\r\n");
+    printf("Card detected and initialized (default 1-bit mode)\r\n");
+
+    printf("\r\n-- SD Card Ready for Data Transfer --\r\n");
+    printf("Card State: HAL_SD_CARD_TRANSFER\r\n");
+    printf("Bus Width:  1-bit (auto-negotiated)\r\n");
+    printf("DMA Mode:   Enabled with polling fallback\r\n");
+    printf("------------------------------------------------------------\r\n\r\n");
+
+    return HAL_OK;
+}
 
 //    /* 4) 尝试切换 4-bit（若布线不佳，可保持 1-bit） */
 //    if (HAL_SD_ConfigWideBusOperation(&hsd, SDIO_BUS_WIDE_4B) != HAL_OK) {

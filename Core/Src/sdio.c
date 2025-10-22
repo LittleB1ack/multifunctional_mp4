@@ -34,7 +34,7 @@ DMA_HandleTypeDef hdma_sdio_tx;
 
 void MX_SDIO_SD_Init(void)
 {
-  printf("[SD] MX_SDIO_SD_Init: begin\r\n");
+  printf("-- SDIO Peripheral Register Configuration --\r\n");
 
   /* USER CODE BEGIN SDIO_Init 0 */
 
@@ -53,10 +53,7 @@ void MX_SDIO_SD_Init(void)
   /* 上电初始化阶段使用低速（~400kHz）：48MHz/(118+2)=~400kHz */
   hsd.Init.ClockDiv = 118;
   /* USER CODE BEGIN SDIO_Init 2 */
-  printf("[SD] MX_SDIO_SD_Init: ClockDiv=%lu, BusWide=%u, FlowCtrl=%u\r\n",
-    (unsigned long)hsd.Init.ClockDiv,
-    (unsigned int)hsd.Init.BusWide,
-    (unsigned int)hsd.Init.HardwareFlowControl);
+  printf("SDIO clock: 400 kHz (init phase), bus width: 1-bit\r\n");
 
   /* USER CODE END SDIO_Init 2 */
   /* 完成卡上电初始化 */
@@ -89,7 +86,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef* sdHandle)
   /* USER CODE END SDIO_MspInit 0 */
   /* SDIO clock enable */
   __HAL_RCC_SDIO_CLK_ENABLE();
-  printf("[SD] HAL_SD_MspInit: SDIO clock enabled\r\n");
+  printf("SDIO clock enabled\r\n");
 
     __HAL_RCC_GPIOC_CLK_ENABLE();
     __HAL_RCC_GPIOD_CLK_ENABLE();
@@ -108,7 +105,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef* sdHandle)
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF12_SDIO;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-  printf("[SD] HAL_SD_MspInit: GPIOC inited\r\n");
+  printf("GPIO Port C configured (SDIO data lines)\r\n");
 
     GPIO_InitStruct.Pin = GPIO_PIN_2;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -116,7 +113,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef* sdHandle)
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF12_SDIO;
     HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-  printf("[SD] HAL_SD_MspInit: GPIOD inited\r\n");
+  printf("GPIO Port D configured (SDIO command line)\r\n");
 
     /* SDIO DMA Init */
     /* SDIO_RX Init */
@@ -137,7 +134,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef* sdHandle)
     {
       Error_Handler();
     }
-    printf("[SD] HAL_SD_MspInit: DMA RX inited\r\n");
+    printf("DMA Stream 3 (RX) configured, priority: HIGH\r\n");
 
     __HAL_LINKDMA(sdHandle,hdmarx,hdma_sdio_rx);
 
@@ -159,7 +156,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef* sdHandle)
     {
       Error_Handler();
     }
-    printf("[SD] HAL_SD_MspInit: DMA TX inited\r\n");
+    printf("DMA Stream 6 (TX) configured, priority: HIGH\r\n");
 
     __HAL_LINKDMA(sdHandle,hdmatx,hdma_sdio_tx);
 

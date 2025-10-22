@@ -9,6 +9,36 @@
   */
 #include "./sd/file_opera.h"
 #include "usart.h"
+#include "./sdram/mem_placement.h"        /* 外部 SRAM 内存放置宏 */
+
+/* ============================================================================
+   文件 I/O 缓冲（迁移至外部 SRAM）
+   ============================================================================ */
+/**
+ * @brief  FatFs 文件读写缓冲
+ * @note   放置在外部 SRAM（0x6C000000）以释放内部 SRAM
+ *         用于大文件读写、流式处理等场景
+ *         容量：64KB
+ */
+static EXTSRAM uint8_t file_io_buf[64 * 1024];
+
+/**
+ * @brief  获取文件 I/O 缓冲指针
+ * @return 返回文件缓冲地址
+ */
+uint8_t* get_file_io_buffer(void)
+{
+  return file_io_buf;
+}
+
+/**
+ * @brief  获取文件 I/O 缓冲大小
+ * @return 返回文件缓冲大小（64KB）
+ */
+uint32_t get_file_io_buffer_size(void)
+{
+  return sizeof(file_io_buf);
+}
 
 void fatTest_GetDiskInfo(void) {
     FATFS *fs;

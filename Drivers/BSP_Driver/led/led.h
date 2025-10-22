@@ -8,8 +8,14 @@ typedef enum{
 	Off = 2
 }LED_STATE;
 
-void LED_Ctrl(uint8_t Ctrl);
+typedef enum{
+	LED_R = 1,
+	LED_G = 2,
+	LED_B = 3
+}LED_TYPE;
 
+
+void LED_Ctrl(LED_TYPE LED ,LED_STATE Ctrl);
 
 
 

@@ -123,8 +123,8 @@ void MX_FREERTOS_Init(void) {
 
   /* FS 任务优先级低于 LVGL，避免抢占 UI 渲染 */
   xTaskCreate(FS_Process, "FS_Task", 512, NULL, osPriorityLow, NULL);
-  /* 创建音频测试任务 */
-  xTaskCreate(Audio_Test_Task, "AudioTest", 1024, NULL, 2, NULL);
+  /* 创建音频测试任务（为隔离故障，暂时禁用） */
+  /* xTaskCreate(Audio_Test_Task, "AudioTest", 1024, NULL, 2, NULL); */
 
 
   /* add threads, ... */
@@ -153,13 +153,40 @@ static void switch_event_cb(lv_event_t * e)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+/* RTOS diagnostics: malloc failed and stack overflow hooks */
+void vApplicationMallocFailedHook(void)
+{
+  /* Called if a call to pvPortMalloc() fails because there is insufficient free memory available. */
+  printf("[RTOS][HOOK] Malloc failed! Free heap too low.\r\n");
+  taskDISABLE_INTERRUPTS();
+  for(;;) { /* Trap here for debugging */ }
+}
+
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
+{
+  /* Called if a stack overflow is detected during context switch. */
+  (void)xTask; /* Unused */
+  printf("[RTOS][HOOK] Stack overflow in task: %s\r\n", pcTaskName ? pcTaskName : "<null>");
+  taskDISABLE_INTERRUPTS();
+  for(;;) { /* Trap here for debugging */ }
+}
 void LED_Process(void *params)
 {
-    uint8_t state;
+  printf("[LED] LED_Process started\r\n");
+    uint8_t state = 0;
+    uint32_t loop_count = 0;
     for(;;)
-    {
+    {		
+			loop_count++;
+			printf("[LED] Loop #%lu: Turning ON\r\n", loop_count);
+			LED_Ctrl(LED_G,On);
+			osDelay(1000);
+			printf("[LED] Loop #%lu: Turning OFF\r\n", loop_count);
+			LED_Ctrl(LED_G,Off);
+			osDelay(1000);
+
         if(ledQueue && xQueueReceive(ledQueue, &state, portMAX_DELAY) == pdTRUE) {
-            LED_Ctrl(state);
+            LED_Ctrl(LED_R,!state);
         }
     }
 }

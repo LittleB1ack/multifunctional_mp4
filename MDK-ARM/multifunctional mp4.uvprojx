@@ -360,7 +360,7 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -369,7 +369,7 @@
             <TextAddressRange></TextAddressRange>
             <DataAddressRange></DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile></ScatterFile>
+            <ScatterFile>my_f407rtos\my_f407rtos.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -386,6 +386,11 @@
               <FileName>startup_stm32f407xx.s</FileName>
               <FileType>2</FileType>
               <FilePath>startup_stm32f407xx.s</FilePath>
+            </File>
+            <File>
+              <FileName>mem_placement.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Drivers\BSP_Driver\sdram\mem_placement.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -921,6 +926,11 @@
               <FileName>bsp_wm8978.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Drivers\BSP_Driver\wm8978\bsp_wm8978.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_sdram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\BSP_Driver\sdram\bsp_sdram.c</FilePath>
             </File>
           </Files>
         </Group>

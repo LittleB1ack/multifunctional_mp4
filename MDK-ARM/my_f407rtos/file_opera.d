@@ -87,3 +87,4 @@ my_f407rtos\file_opera.o: ../Core/Inc/rtc.h
 my_f407rtos\file_opera.o: ../Drivers/SYSTEM/usart/usart.h
 my_f407rtos\file_opera.o: ../Drivers/SYSTEM/sys/sys.h
 my_f407rtos\file_opera.o: ../Drivers/CMSIS/Include/core_cm4.h
+my_f407rtos\file_opera.o: ../Drivers/BSP_Driver/./sdram/mem_placement.h

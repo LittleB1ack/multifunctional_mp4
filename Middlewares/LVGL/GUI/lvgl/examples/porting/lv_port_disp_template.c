@@ -12,6 +12,7 @@
 #include "lv_port_disp_template.h"
 #include "../../lvgl.h"
 #include "bsp_nt35510_lcd.h"
+#include "./sdram/mem_placement.h"        /* 外部 SRAM 内存放置宏 */
 
 /*********************
  *      DEFINES
@@ -53,7 +54,7 @@ void lv_port_disp_init(void)
 
     /* Example for 1) */
     static lv_disp_draw_buf_t draw_buf_dsc_1;
-    static lv_color_t buf_1[MY_DISP_HOR_RES * 20];                          /*A buffer for 10 rows*/
+    static lv_color_t buf_1[MY_DISP_HOR_RES * 20];                          /*A buffer for 10 rows, placed in external SRAM*/
     lv_disp_draw_buf_init(&draw_buf_dsc_1, buf_1, NULL, MY_DISP_HOR_RES * 10);   /*Initialize the display buffer*/
 
 

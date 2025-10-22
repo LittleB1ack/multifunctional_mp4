@@ -70,5 +70,7 @@ my_f407rtos\stm32f4xx_it.o: ../Core/Inc/stm32f4xx_it.h
 my_f407rtos\stm32f4xx_it.o: ../Core/Inc/sdio.h
 my_f407rtos\stm32f4xx_it.o: ../Core/Inc/dma.h
 my_f407rtos\stm32f4xx_it.o: ../Drivers/BSP_Driver/./wm8978/bsp_wm8978.h
+my_f407rtos\stm32f4xx_it.o: F:\Keli5 MDK\ARM\ARMCC\Bin\..\include\stdio.h
+my_f407rtos\stm32f4xx_it.o: ../Drivers/CMSIS/Include/core_cm4.h
 my_f407rtos\stm32f4xx_it.o: ../Drivers/BSP_Driver/TOUCH/bsp_i2c_touch.h
 my_f407rtos\stm32f4xx_it.o: ../Drivers/BSP_Driver/TOUCH/gt9xx.h

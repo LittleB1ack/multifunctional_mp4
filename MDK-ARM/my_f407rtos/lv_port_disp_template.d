@@ -188,3 +188,4 @@ my_f407rtos\lv_port_disp_template.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4
 my_f407rtos\lv_port_disp_template.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h
 my_f407rtos\lv_port_disp_template.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h
 my_f407rtos\lv_port_disp_template.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_hcd.h
+my_f407rtos\lv_port_disp_template.o: ../Drivers/BSP_Driver/./sdram/mem_placement.h

@@ -23,6 +23,11 @@
 #include "sdio.h"
 #include "dma.h"
 #include "./wm8978/bsp_wm8978.h"
+#include "stm32f4xx_hal.h"
+#include <stdio.h>  /* fault diagnostics */
+#include <stdint.h>
+#include "stm32f4xx.h"  /* SCB and core intrinsics */
+#include "core_cm4.h"    /* Ensure SCB, __disable_irq, __NOP are visible to the compiler */
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -90,15 +95,53 @@ void NMI_Handler(void)
 /**
   * @brief This function handles Hard fault interrupt.
   */
-void HardFault_Handler(void)
+__asm void HardFault_Handler(void)
 {
-  /* USER CODE BEGIN HardFault_IRQn 0 */
+  IMPORT  HardFault_HandlerC
+  TST     LR, #4
+  ITE     EQ
+  MRSEQ   R0, MSP
+  MRSNE   R0, PSP
+  B       HardFault_HandlerC
+}
 
-  /* USER CODE END HardFault_IRQn 0 */
-  while (1)
-  {
-    /* USER CODE BEGIN W1_HardFault_IRQn 0 */
-    /* USER CODE END W1_HardFault_IRQn 0 */
+void HardFault_HandlerC(uint32_t *stacked_sp)
+{
+  uint32_t stacked_r0  = stacked_sp[0];
+  uint32_t stacked_r1  = stacked_sp[1];
+  uint32_t stacked_r2  = stacked_sp[2];
+  uint32_t stacked_r3  = stacked_sp[3];
+  uint32_t stacked_r12 = stacked_sp[4];
+  uint32_t stacked_lr  = stacked_sp[5];
+  uint32_t stacked_pc  = stacked_sp[6];
+  uint32_t stacked_psr = stacked_sp[7];
+
+  printf("[FAULT] HardFault!\r\n");
+  printf(" r0  = 0x%08lX\r\n", (unsigned long)stacked_r0);
+  printf(" r1  = 0x%08lX\r\n", (unsigned long)stacked_r1);
+  printf(" r2  = 0x%08lX\r\n", (unsigned long)stacked_r2);
+  printf(" r3  = 0x%08lX\r\n", (unsigned long)stacked_r3);
+  printf(" r12 = 0x%08lX\r\n", (unsigned long)stacked_r12);
+  printf(" lr  = 0x%08lX\r\n", (unsigned long)stacked_lr);
+  printf(" pc  = 0x%08lX\r\n", (unsigned long)stacked_pc);
+  printf(" psr = 0x%08lX\r\n", (unsigned long)stacked_psr);
+  printf(" HFSR=0x%08lX CFSR=0x%08lX BFAR=0x%08lX MMFAR=0x%08lX\r\n",
+    (unsigned long)SCB->HFSR, (unsigned long)SCB->CFSR,
+    (unsigned long)SCB->BFAR, (unsigned long)SCB->MMFAR);
+
+  /* Visual panic indicator: blink PF6 using register-level access */
+  __disable_irq();
+  /* Enable GPIOF clock */
+  RCC->AHB1ENR |= RCC_AHB1ENR_GPIOFEN;
+  (void)RCC->AHB1ENR;
+  /* PF6 as output */
+  GPIOF->MODER &= ~(3UL << (6U * 2U));
+  GPIOF->MODER |=  (1UL << (6U * 2U));
+  GPIOF->OTYPER &= ~(1UL << 6);
+  GPIOF->PUPDR &= ~(3UL << (6U * 2U));
+  for(;;) {
+    GPIOF->ODR ^= (1UL << 6);
+    for (volatile uint32_t d = 0; d < 200000U; ++d) { __NOP(); }
   }
 }
 
@@ -108,12 +151,20 @@ void HardFault_Handler(void)
 void MemManage_Handler(void)
 {
   /* USER CODE BEGIN MemoryManagement_IRQn 0 */
+  printf("[FAULT] MemManage fault!\r\n");
 
   /* USER CODE END MemoryManagement_IRQn 0 */
-  while (1)
-  {
-    /* USER CODE BEGIN W1_MemoryManagement_IRQn 0 */
-    /* USER CODE END W1_MemoryManagement_IRQn 0 */
+  /* Blink PF6 to indicate fault */
+  __disable_irq();
+  RCC->AHB1ENR |= RCC_AHB1ENR_GPIOFEN;
+  (void)RCC->AHB1ENR;
+  GPIOF->MODER &= ~(3UL << (6U * 2U));
+  GPIOF->MODER |=  (1UL << (6U * 2U));
+  GPIOF->OTYPER &= ~(1UL << 6);
+  GPIOF->PUPDR &= ~(3UL << (6U * 2U));
+  for(;;) {
+    GPIOF->ODR ^= (1UL << 6);
+    for (volatile uint32_t d = 0; d < 200000U; ++d) { __NOP(); }
   }
 }
 
@@ -123,12 +174,19 @@ void MemManage_Handler(void)
 void BusFault_Handler(void)
 {
   /* USER CODE BEGIN BusFault_IRQn 0 */
+  printf("[FAULT] BusFault!\r\n");
 
   /* USER CODE END BusFault_IRQn 0 */
-  while (1)
-  {
-    /* USER CODE BEGIN W1_BusFault_IRQn 0 */
-    /* USER CODE END W1_BusFault_IRQn 0 */
+  __disable_irq();
+  RCC->AHB1ENR |= RCC_AHB1ENR_GPIOFEN;
+  (void)RCC->AHB1ENR;
+  GPIOF->MODER &= ~(3UL << (6U * 2U));
+  GPIOF->MODER |=  (1UL << (6U * 2U));
+  GPIOF->OTYPER &= ~(1UL << 6);
+  GPIOF->PUPDR &= ~(3UL << (6U * 2U));
+  for(;;) {
+    GPIOF->ODR ^= (1UL << 6);
+    for (volatile uint32_t d = 0; d < 200000U; ++d) { __NOP(); }
   }
 }
 

@@ -49,17 +49,18 @@
 
 
 #include "coder.h"
+#include "./sdram/mem_placement.h"        /* 外部 SRAM 内存放置宏 */
 
 #define static_buffers
 #ifdef static_buffers
-MP3DecInfo  mp3DecInfo;     //  0x7f0 =  2032 
-SubbandInfo sbi;            // 0x2204 =  8708
-IMDCTInfo mi;               // 0x1b20 =  6944
-HuffmanInfo hi;             // 0x1210 =  4624
-DequantInfo di;             //  0x348 =   840
-ScaleFactorInfo sfi;        //  0x124 =   292
-SideInfo si;                //  0x148 =   328
-FrameHeader fh;             //   0x38 =    56
+EXTSRAM MP3DecInfo  mp3DecInfo;     //  0x7f0 =  2032, placed in external SRAM
+EXTSRAM SubbandInfo sbi;            // 0x2204 =  8708, placed in external SRAM
+EXTSRAM IMDCTInfo mi;               // 0x1b20 =  6944, placed in external SRAM
+EXTSRAM HuffmanInfo hi;             // 0x1210 =  4624, placed in external SRAM
+EXTSRAM DequantInfo di;             //  0x348 =   840, placed in external SRAM
+EXTSRAM ScaleFactorInfo sfi;        //  0x124 =   292, placed in external SRAM
+EXTSRAM SideInfo si;                //  0x148 =   328, placed in external SRAM
+EXTSRAM FrameHeader fh;             //   0x38 =    56, placed in external SRAM
 #else
 #include "mem.h"
 //#define malloc

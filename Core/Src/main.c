@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
+#include "cmsis_os2.h"  /* for osKernelInitialize/osKernelStart (CMSIS-RTOS2) */
 #include "gpio.h"
 #include "dma.h"
 #include "sdio.h"
@@ -37,6 +38,7 @@
 #include "bsp_nt35510_lcd.h"
 #include "bsp_debug_usart.h"
 #include "../../Middlewares/Third_Party/FatFs/Target/bsp_driver_sd.h"
+#include "./sdram/bsp_sdram.h"  
 
 /* LVGL 相关头文件 */
 #include "lvgl.h"
@@ -100,43 +102,76 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
 	DEBUG_USART_Config();               /* 先初始化串口，保证后续日志可见 */
+
+  printf("\r\n\r\n");
+  printf("------------------------------------------------------------\r\n");
+  printf("STM32F407 Multi-Functional MP4 Player - System Initializing\r\n");
+  printf("------------------------------------------------------------\r\n");
+  printf("\r\n");
   
-	printf("\r\n\r\n\r\n\r\n================[BOOT    START]================ \r\n");
-  printf("[BOOT] USART ready\r\n");
   delay_init(168);                    /* 延时初始化（基于 168MHz） */
+  printf("[INIT] Clock:        168 MHz\r\n");
+  printf("[INIT] USART:        Ready (115200 8N1)\r\n");
+  
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
+  printf("\r\n------------------------------------------------------------\r\n");
+  printf("System Peripheral Initialization\r\n");
+  printf("------------------------------------------------------------\r\n");
   MX_GPIO_Init();
-  printf("[BOOT] GPIO init done\r\n");
-	
-	
+  printf("[GPIO] All GPIO ports initialized\r\n");
+
+  /* 打印内存布局摘要 - 用于资源分配诊断 */
+  printf("\r\n");
+  sram_print_init_summary();
 	
   /* USER CODE BEGIN 2 */
   /* 按 HAL 要求先初始化 DMA 与 SDIO（配置 hsd、打开 SDIO 时钟/DMA 时钟/中断），再调用 BSP_SD_Init */
   MX_DMA_Init();
+  printf("[DMA]  DMA channels initialized\r\n");
+  
   MX_SDIO_SD_Init();
-  printf("[BOOT] Init SD begin\r\n");
-  /* 确保先完成 HAL_SD 初始化（与 FreeRTOS_FATFS 一致的流程） */
+  printf("[SDIO] SDIO interface initialized\r\n");
+  
+  printf("\r\n------------------------------------------------------------\r\n");
+  printf("SD Card Initialization\r\n");
+  printf("------------------------------------------------------------\r\n");
   if(BSP_SD_Init() != MSD_OK) {
-    printf("[APP] BSP_SD_Init failed, abort SD tests\r\n");
+    printf("[SD] Initialization: FAIL\r\n");
   } else {
-    printf("[APP] BSP_SD_Init ok\r\n");
+    printf("[SD] Initialization: PASS\r\n");
+    printf("\r\n");
     BSP_SD_PrintCardInfo();           /* 打印 SD 卡信息 */
-    BSP_SD_Test(1);                 /* 可选：做一次读写自检 */
+    printf("\r\n[SD] Running read/write test...\r\n");
+    BSP_SD_Test(1);                   /* 可选：做一次读写自检 */
+    printf("[SD] Test completed\r\n");
   }
 
   /* USER CODE END 2 */
 
   /* Init scheduler */
+  printf("\r\n------------------------------------------------------------\r\n");
+  printf("FreeRTOS Kernel Initialization\r\n");
+  printf("------------------------------------------------------------\r\n");
   osKernelInitialize();
+  printf("[RTOS] Kernel initialized\r\n");
 
-//  /* Call init function for freertos objects (in freertos.c) */
+  printf("[RTOS] Creating tasks and semaphores...\r\n");
   MX_FREERTOS_Init();
-  /* Start scheduler */
+  printf("[RTOS] Tasks created successfully\r\n");
+  
+  printf("\r\n");
+  printf("------------------------------------------------------------\r\n");
+  printf("Starting FreeRTOS Kernel Scheduler\r\n");
+  printf("------------------------------------------------------------\r\n");
+  printf("\r\n");
+  
   osKernelStart();
+  
+  /* If code continues past here, the scheduler did not start */
+  printf("\r\n[RTOS][ERROR] Scheduler failed to start!\r\n");
 
   /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
@@ -144,9 +179,9 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
   }
+    
+
   /* USER CODE END 3 */
 }
 
@@ -223,11 +258,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-	
-  /* User can add his own implementation to report the HAL error return state */
+  /* 在Error_Handler中快速闪烁红色LED，方便判断是否进入了错误处理 */
   __disable_irq();
+  __HAL_RCC_GPIOF_CLK_ENABLE();
+  GPIO_InitTypeDef gi = {0};
+  gi.Pin = GPIO_PIN_6;
+  gi.Mode = GPIO_MODE_OUTPUT_PP;
+  gi.Pull = GPIO_NOPULL;
+  gi.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOF, &gi);
   while (1)
   {
+    HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_6);
+    HAL_Delay(100);
   }
   /* USER CODE END Error_Handler_Debug */
 }

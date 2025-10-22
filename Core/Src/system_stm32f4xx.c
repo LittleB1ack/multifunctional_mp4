@@ -33,6 +33,17 @@
   ******************************************************************************
   */
 
+/* Includes ------------------------------------------------------------------*/
+/*user defined includes*/
+#include "./sdram/bsp_sdram.h"
+
+/* 允许在需要时临时关闭“早期FSMC外部SRAM初始化”，用于故障隔离 */
+#ifndef EARLY_FSMC_SRAM_ENABLE
+#define EARLY_FSMC_SRAM_ENABLE 1
+#endif
+/* Private typedef -----------------------------------------------------------*/
+
+
 /** @addtogroup CMSIS
   * @{
   */
@@ -74,14 +85,14 @@
 
 /************************* Miscellaneous Configuration ************************/
 /*!< Uncomment the following line if you need to use external SRAM or SDRAM as data memory  */
-#if defined(STM32F405xx) || defined(STM32F415xx) || defined(STM32F407xx) || defined(STM32F417xx)\
- || defined(STM32F427xx) || defined(STM32F437xx) || defined(STM32F429xx) || defined(STM32F439xx)\
+#if defined(STM32F405xx) || defined(STM32F415xx) || defined(STM32F407xx) || defined(STM32F417xx) \
+ || defined(STM32F427xx) || defined(STM32F437xx) || defined(STM32F429xx) || defined(STM32F439xx) \
  || defined(STM32F469xx) || defined(STM32F479xx) || defined(STM32F412Zx) || defined(STM32F412Vx)
 /* #define DATA_IN_ExtSRAM */
 #endif /* STM32F40xxx || STM32F41xxx || STM32F42xxx || STM32F43xxx || STM32F469xx || STM32F479xx ||\
           STM32F412Zx || STM32F412Vx */
- 
-#if defined(STM32F427xx) || defined(STM32F437xx) || defined(STM32F429xx) || defined(STM32F439xx)\
+
+#if defined(STM32F427xx) || defined(STM32F437xx) || defined(STM32F429xx) || defined(STM32F439xx) \
  || defined(STM32F446xx) || defined(STM32F469xx) || defined(STM32F479xx)
 /* #define DATA_IN_ExtSDRAM */
 #endif /* STM32F427xx || STM32F437xx || STM32F429xx || STM32F439xx || STM32F446xx || STM32F469xx ||\
@@ -172,6 +183,25 @@ void SystemInit(void)
     SCB->CPACR |= ((3UL << 10*2)|(3UL << 11*2));  /* set CP10 and CP11 Full Access */
   #endif
 
+  /* Earliest visible sign: briefly toggle PF6 LED using register-level access
+     to confirm we reached SystemInit (runs before main and HAL_Init). */
+  do {
+    /* Enable GPIOF clock */
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOFEN;
+    (void)RCC->AHB1ENR; /* delay after enabling clock */
+    /* Configure PF6 as push-pull output, no pull */
+    GPIOF->MODER &= ~(3UL << (6U * 2U));
+    GPIOF->MODER |=  (1UL << (6U * 2U));
+    GPIOF->OTYPER &= ~(1UL << 6);
+    GPIOF->OSPEEDR &= ~(3UL << (6U * 2U));
+    GPIOF->PUPDR &= ~(3UL << (6U * 2U));
+    /* Active-low LED on many boards: drive low then high with tiny delay */
+    GPIOF->BSRR = (uint32_t)(1UL << (6U + 16U)); /* RESET PF6 */
+    for (volatile uint32_t d = 0; d < 10000U; ++d) { __NOP(); }
+    GPIOF->BSRR = (uint32_t)(1UL << 6U); /* SET PF6 */
+    for (volatile uint32_t d = 0; d < 10000U; ++d) { __NOP(); }
+  } while (0);
+
 #if defined (DATA_IN_ExtSRAM) || defined (DATA_IN_ExtSDRAM)
   SystemInit_ExtMemCtl(); 
 #endif /* DATA_IN_ExtSRAM || DATA_IN_ExtSDRAM */
@@ -180,6 +210,13 @@ void SystemInit(void)
 #if defined(USER_VECT_TAB_ADDRESS)
   SCB->VTOR = VECT_TAB_BASE_ADDRESS | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal SRAM */
 #endif /* USER_VECT_TAB_ADDRESS */
+
+  /* 可选：在 C 运行时初始化之前进行 FSMC 外部SRAM初始化（用于将 RW/ZI 放入外部SRAM 的方案A）
+   * 目前为了隔离故障，默认关闭（EARLY_FSMC_SRAM_ENABLE=0）。
+   */
+#if (EARLY_FSMC_SRAM_ENABLE)
+  FSMC_SRAM_Init_Bank4_16bit_Minimal();
+#endif
 }
 
 /**
@@ -264,6 +301,7 @@ void SystemCoreClockUpdate(void)
   tmp = AHBPrescTable[((RCC->CFGR & RCC_CFGR_HPRE) >> 4)];
   /* HCLK frequency */
   SystemCoreClock >>= tmp;
+
 }
 
 #if defined (DATA_IN_ExtSRAM) && defined (DATA_IN_ExtSDRAM)
