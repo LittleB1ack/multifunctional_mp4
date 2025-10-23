@@ -82,8 +82,8 @@ static EXTSRAM uint16_t lvgl_draw_buf_demo[MY_DISP_HOR_RES * 20];
 */
 
 /* 模拟 Helix 的主数据缓冲（实际应参考 Helix 源码） */
-static EXTSRAM int32_t helix_main_data_buf[4096];
-static EXTSRAM int16_t helix_output_buf[1152];    /* MP3 帧大小 */
+static int32_t helix_main_data_buf[4096];
+static int16_t helix_output_buf[1152];    /* MP3 帧大小 */
 
 
 /* ============================================================================

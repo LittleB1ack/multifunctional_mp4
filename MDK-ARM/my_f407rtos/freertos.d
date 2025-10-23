@@ -200,9 +200,10 @@ my_f407rtos\freertos.o: ../Middlewares/LVGL/GUI/lvgl/src/extra/libs/freetype/lv_
 my_f407rtos\freertos.o: ../Middlewares/LVGL/GUI/lvgl/src/extra/libs/rlottie/lv_rlottie.h
 my_f407rtos\freertos.o: ../Middlewares/LVGL/GUI/lvgl/src/extra/libs/ffmpeg/lv_ffmpeg.h
 my_f407rtos\freertos.o: F:\Keli5 MDK\ARM\ARMCC\Bin\..\include\stdio.h
+my_f407rtos\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
+my_f407rtos\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
 my_f407rtos\freertos.o: ../Middlewares/LVGL/GUI/lvgl/examples/porting/lv_port_disp_template.h
 my_f407rtos\freertos.o: ../Middlewares/LVGL/GUI/lvgl/examples/porting/lv_port_indev_template.h
-my_f407rtos\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
 my_f407rtos\freertos.o: ..\Middlewares\Third_Party\FatFs\App\fatfs.h
 my_f407rtos\freertos.o: ..\Middlewares\Third_Party\FatFs\src\ff.h
 my_f407rtos\freertos.o: ..\Middlewares\Third_Party\FatFs\src\integer.h

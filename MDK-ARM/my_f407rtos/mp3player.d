@@ -1,6 +1,7 @@
 my_f407rtos\mp3player.o: ..\Middlewares\Third_Party\mp3\APP\mp3Player.c
 my_f407rtos\mp3player.o: F:\Keli5 MDK\ARM\ARMCC\Bin\..\include\stdio.h
 my_f407rtos\mp3player.o: F:\Keli5 MDK\ARM\ARMCC\Bin\..\include\string.h
+my_f407rtos\mp3player.o: F:\Keli5 MDK\ARM\ARMCC\Bin\..\include\math.h
 my_f407rtos\mp3player.o: ../Drivers/BSP_Driver/./usart/bsp_debug_usart.h
 my_f407rtos\mp3player.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h
 my_f407rtos\mp3player.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h
@@ -92,3 +93,5 @@ my_f407rtos\mp3player.o: ..\Middlewares\Third_Party\mp3\APP\mp3Player.h
 my_f407rtos\mp3player.o: F:\Keli5 MDK\ARM\ARMCC\Bin\..\include\inttypes.h
 my_f407rtos\mp3player.o: ../Drivers/BSP_Driver/./led/led.h
 my_f407rtos\mp3player.o: ..\Middlewares\Third_Party\mp3\pub\mp3dec.h
+my_f407rtos\mp3player.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
+my_f407rtos\mp3player.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h

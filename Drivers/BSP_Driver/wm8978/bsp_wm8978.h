@@ -82,6 +82,7 @@ void wm8978_SetOUT1Volume(uint8_t _ucVolume);
 uint8_t wm8978_ReadOUT1Volume(void);
 uint8_t wm8978_ReadOUT2Volume(void);
 void wm8978_NotchFilter(uint16_t _NFA0, uint16_t _NFA1);
+uint16_t wm8978_ReadReg(uint8_t _ucRegAddr);  /* 读取寄存器缓存值 */
 																					
 /*---------------------------------------------------------------------------------------------*/
 /*------------------------   I2S控制数据传输部分  ---------------------------------------------*/																					
@@ -153,6 +154,7 @@ void I2Sx_Mode_Config(const uint16_t _usStandard, const uint16_t _usWordLen,cons
 void I2Sx_TX_DMA_Init(const uint32_t buffer0,const uint32_t buffer1,const uint32_t num);
 void I2S_Play_Start(void);
 void I2S_Play_Stop(void);
+uint8_t I2S_DMA_Get_CurrentTarget(void);  /* 获取DMA当前目标缓冲区 */
 extern void I2Sx_TX_DMA_STREAM_IRQFUN(void);
 void I2Sxext_Mode_Config(const uint16_t _usStandard, const uint16_t _usWordLen,const uint32_t _usAudioFreq);
 void I2Sxext_RX_DMA_Init(const uint16_t *buffer0,const uint16_t *buffer1,const uint32_t num);

@@ -129,20 +129,7 @@ void HardFault_HandlerC(uint32_t *stacked_sp)
     (unsigned long)SCB->HFSR, (unsigned long)SCB->CFSR,
     (unsigned long)SCB->BFAR, (unsigned long)SCB->MMFAR);
 
-  /* Visual panic indicator: blink PF6 using register-level access */
-  __disable_irq();
-  /* Enable GPIOF clock */
-  RCC->AHB1ENR |= RCC_AHB1ENR_GPIOFEN;
-  (void)RCC->AHB1ENR;
-  /* PF6 as output */
-  GPIOF->MODER &= ~(3UL << (6U * 2U));
-  GPIOF->MODER |=  (1UL << (6U * 2U));
-  GPIOF->OTYPER &= ~(1UL << 6);
-  GPIOF->PUPDR &= ~(3UL << (6U * 2U));
-  for(;;) {
-    GPIOF->ODR ^= (1UL << 6);
-    for (volatile uint32_t d = 0; d < 200000U; ++d) { __NOP(); }
-  }
+ 
 }
 
 /**

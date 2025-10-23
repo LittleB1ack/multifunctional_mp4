@@ -125,7 +125,7 @@ int main(void)
 
   /* 打印内存布局摘要 - 用于资源分配诊断 */
   printf("\r\n");
-  sram_print_init_summary();
+  // sram_print_init_summary(); // 暂时注释，因为EXTSRAM测试失败
 	
   /* USER CODE BEGIN 2 */
   /* 按 HAL 要求先初始化 DMA 与 SDIO（配置 hsd、打开 SDIO 时钟/DMA 时钟/中断），再调用 BSP_SD_Init */

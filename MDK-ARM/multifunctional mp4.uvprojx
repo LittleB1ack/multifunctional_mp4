@@ -387,11 +387,6 @@
               <FileType>2</FileType>
               <FilePath>startup_stm32f407xx.s</FilePath>
             </File>
-            <File>
-              <FileName>mem_placement.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Drivers\BSP_Driver\sdram\mem_placement.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>

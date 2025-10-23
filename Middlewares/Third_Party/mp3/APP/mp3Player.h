@@ -21,6 +21,7 @@ typedef struct
 }MP3_TYPE;	
 
 void mp3PlayerDemo(const char *mp3file);
+void mp3TestTone(uint32_t freq_hz, uint8_t duration_sec);  /* ≤‚ ‘“Ùµ˜ */
 
 void MP3Player_I2S_DMA_TX_Callback(void);
 #endif  /* __MP3PLAYER_H__   */

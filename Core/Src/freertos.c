@@ -29,6 +29,7 @@
 #include "lvgl.h"
 #include "stdio.h"
 #include "string.h"
+#include "semphr.h"
 #include "lv_port_disp_template.h"
 #include "lv_port_indev_template.h"
 #include "queue.h"
@@ -64,7 +65,7 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 static QueueHandle_t ledQueue;  /* 全局队列，用于 LVGL -> LED 任务传输状态 */
-
+static SemaphoreHandle_t fsReadySemaphore; /* 文件系统就绪信号量 */
 /* USER CODE END Variables */
 
 
@@ -108,6 +109,7 @@ void MX_FREERTOS_Init(void) {
 
   /* 创建 LED 状态队列（在创建任务前） */
   ledQueue = xQueueCreate(4, sizeof(uint8_t));
+  fsReadySemaphore = xSemaphoreCreateBinary(); /* 创建文件系统就绪信号量 */
 
   /* USER CODE END RTOS_QUEUES */
 
@@ -121,10 +123,10 @@ void MX_FREERTOS_Init(void) {
   /* 创建 LVGL 任务 */
   xTaskCreate(LVGL_Process,"LVGL_Task",512,NULL,osPriorityNormal,NULL);
 
-  /* FS 任务优先级低于 LVGL，避免抢占 UI 渲染 */
-  xTaskCreate(FS_Process, "FS_Task", 512, NULL, osPriorityLow, NULL);
-  /* 创建音频测试任务（为隔离故障，暂时禁用） */
-  /* xTaskCreate(Audio_Test_Task, "AudioTest", 1024, NULL, 2, NULL); */
+  /* FS 任务优先级设为 osPriorityAboveNormal，确保优先完成文件系统初始化 */
+  xTaskCreate(FS_Process, "FS_Task", 512, NULL, osPriorityAboveNormal, NULL);
+  /* 创建音频任务，增加栈大小到2048，优先级设为 osPriorityNormal，等待文件系统就绪后再运行 */
+  xTaskCreate(Audio_Test_Task, "AudioTest", 2048, NULL, osPriorityBelowNormal, NULL); 
 
 
   /* add threads, ... */
@@ -255,116 +257,62 @@ void FS_Process(void *params)
     /* 简单读写验证 */
     FIL fp;
     UINT bw = 0;
+    printf("[FS] Testing write...\r\n");
     if (f_open(&fp, "0:/hello.txt", FA_WRITE | FA_CREATE_ALWAYS) == FR_OK) {
       const char *msg = "Hello, FatFs + FreeRTOS!\r\n";
       f_write(&fp, msg, (UINT)strlen(msg), &bw);
       f_close(&fp);
       printf("[FS] write %u bytes\r\n", bw);
+    } else {
+      printf("[FS] write failed!\r\n");
     }
+    
+    printf("[FS] Testing read...\r\n");
     if (f_open(&fp, "0:/hello.txt", FA_READ) == FR_OK) {
       char buf[64] = {0};
       UINT br = 0;
       f_read(&fp, buf, sizeof(buf)-1, &br);
       f_close(&fp);
-      printf("[FS] read %u bytes: %s\r\n", br, buf);
+      printf("[FS] read %u bytes: %s", br, buf);
+    } else {
+      printf("[FS] read failed!\r\n");
     }
+    
+    /* 文件系统已就绪，释放信号量通知其他任务 */
+    printf("[FS] Giving semaphore (handle=0x%08lX)...\r\n", (uint32_t)fsReadySemaphore);
+    if (fsReadySemaphore != NULL) {
+        BaseType_t result = xSemaphoreGive(fsReadySemaphore);
+        printf("[FS] Filesystem ready semaphore given (result=%d).\r\n", result);
+    } else {
+        printf("[FS] ERROR: Semaphore is NULL!\r\n");
+    }
+
   } else {
     printf("[FS] mount failed: %d\r\n", fr);
   }
 
-  /* 文件系统初始化任务完成后可自行删除 */
-  vTaskDelete(NULL);
+  /* 任务完成其初始化使命，但保持运行以备将来使用，或挂起 */
+  vTaskSuspend(NULL);
 }
 
 void Audio_Test_Task(void *params)
 {
-		printf("[AUDIO] ========================================\r\n");
-		printf("[AUDIO] I2S-DMA-WM8978 Test Started\r\n");
-		printf("[AUDIO] ========================================\r\n");
-		
-		// ============= Step 1: Reset WM8978 =============
-		printf("[AUDIO] Step 1: Resetting WM8978...\r\n");
-		wm8978_Reset();
-		vTaskDelay(pdMS_TO_TICKS(10));
-		printf("[AUDIO] ? WM8978 reset done\r\n");
-		
-		// ============= Step 2: Configure Audio Path =============
-		printf("[AUDIO] Step 2: Configuring audio path...\r\n");
-		wm8978_CfgAudioPath(DAC_ON, EAR_LEFT_ON | EAR_RIGHT_ON);
-		printf("[AUDIO] ? Audio path configured (DAC -> Headphones)\r\n");
-		
-		// ============= Step 3: Set Volume =============
-		printf("[AUDIO] Step 3: Setting volume...\r\n");
-		wm8978_SetOUT1Volume(45);  // 设置音量为 45 (0-63)
-		printf("[AUDIO] ? Volume set to 45\r\n");
-		
-		// ============= Step 4: Configure I2S Interface =============
-		printf("[AUDIO] Step 4: Configuring I2S interface...\r\n");
-		wm8978_CfgAudioIF(I2S_STANDARD_PHILIPS, 16);  // Philips 标准，16-bit
-		printf("[AUDIO] ? I2S interface configured\r\n");
-		
-		// ============= Step 5: Initialize I2S =============
-		printf("[AUDIO] Step 5: Initializing I2S and GPIO...\r\n");
-		I2S_Stop();
-		I2S_GPIO_Config();
-		printf("[AUDIO] ? I2S GPIO initialized\r\n");
-		
-		printf("[AUDIO] Step 6: Configuring I2S mode...\r\n");
-		I2Sx_Mode_Config(I2S_STANDARD_PHILIPS, I2S_DATAFORMAT_16B, I2S_AUDIOFREQ_44K);
-		printf("[AUDIO] ? I2S mode configured (44.1kHz)\r\n");
-		
-		// ============= Step 6: Generate Audio Buffers =============
-		printf("[AUDIO] Step 7: Generating audio buffers...\r\n");
-		
-		// 双缓冲，每个 1152 采样点 (44.1kHz 下 ~26ms)
-		static int16_t sine_buffer[2][1152];
-		
-		// 生成 1kHz 正弦波
-		float phase = 0.0f;
-		float phase_step = (2.0f * 3.14159265f * 1000.0f) / 44100.0f;  // 1000Hz
-		
-		for (int i = 0; i < 1152; i++) {
-				int16_t sample = (int16_t)(32000.0f * sinf(phase));
-				sine_buffer[0][i] = sample;
-				sine_buffer[1][i] = sample;
-				phase += phase_step;
-				if (phase > 2.0f * 3.14159265f) {
-						phase -= 2.0f * 3.14159265f;
-				}
-		}
-		printf("[AUDIO] ? Audio buffers generated (1kHz sine wave)\r\n");
-		
-		// ============= Step 7: Initialize DMA =============
-		printf("[AUDIO] Step 8: Initializing DMA transfer...\r\n");
-		I2Sx_TX_DMA_Init((uint32_t)&sine_buffer[0][0], 
-										 (uint32_t)&sine_buffer[1][0], 
-										 1152);
-		printf("[AUDIO] ? DMA initialized\r\n");
-		
-		// ============= Step 8: Start Playback =============
-		printf("[AUDIO] Step 9: Starting playback...\r\n");
-		I2S_Play_Start();
-		printf("[AUDIO] ? Playback started\r\n");
-		printf("[AUDIO] ========================================\r\n");
-		printf("[AUDIO] Playing 1kHz tone for 10 seconds...\r\n");
-		printf("[AUDIO] Please listen carefully!\r\n");
-		printf("[AUDIO] ========================================\r\n");
-		
-		// 播放 10 秒
-		vTaskDelay(pdMS_TO_TICKS(10000));
-		
-		// ============= Step 9: Stop Playback =============
-		printf("[AUDIO] ========================================\r\n");
-		printf("[AUDIO] Stopping playback...\r\n");
-		I2S_Play_Stop();
-		wm8978_OutMute(1);  // 关闭输出
-		printf("[AUDIO] ? Playback stopped\r\n");
-		printf("[AUDIO] ========================================\r\n");
-		printf("[AUDIO] Test completed!\r\n");
-		printf("[AUDIO] ========================================\r\n");
-		
-		// 删除任务
-		vTaskDelete(NULL);
+ /* 等待文件系统就绪 */
+    xSemaphoreTake(fsReadySemaphore, portMAX_DELAY);
+    
+    /* 播放测试音(可选) */
+    mp3TestTone(440, 1);  // 440Hz,1秒
+    
+    /* 播放 MP3 文件 */
+    mp3PlayerDemo("0:/test.mp3");
+    
+    /* 播放结束后的清理 */
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    
+    /* 如需循环播放 */
+    for(;;) {
+        vTaskDelay(pdMS_TO_TICKS(500));
+    }
 }
 
 

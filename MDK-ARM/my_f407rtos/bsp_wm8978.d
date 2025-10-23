@@ -68,6 +68,9 @@ my_f407rtos\bsp_wm8978.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_
 my_f407rtos\bsp_wm8978.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_hcd.h
 my_f407rtos\bsp_wm8978.o: ../Drivers/BSP_Driver/./usart/bsp_debug_usart.h
 my_f407rtos\bsp_wm8978.o: F:\Keli5 MDK\ARM\ARMCC\Bin\..\include\stdio.h
+my_f407rtos\bsp_wm8978.o: ../Drivers/SYSTEM/delay/delay.h
+my_f407rtos\bsp_wm8978.o: ../Drivers/SYSTEM/sys/sys.h
+my_f407rtos\bsp_wm8978.o: ../Drivers/CMSIS/Include/core_cm4.h
 my_f407rtos\bsp_wm8978.o: ..\Middlewares\Third_Party\mp3\APP\mp3Player.h
 my_f407rtos\bsp_wm8978.o: F:\Keli5 MDK\ARM\ARMCC\Bin\..\include\inttypes.h
 my_f407rtos\bsp_wm8978.o: ../Drivers/BSP_Driver/./led/led.h
