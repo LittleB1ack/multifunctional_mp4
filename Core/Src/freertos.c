@@ -18,21 +18,28 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
+#include "stdio.h"
+#include "string.h"
+
+/*FreeRTOS driver */
 #include "FreeRTOS.h"
 #include "task.h"
 #include "main.h"
 #include "cmsis_os.h"
-
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
-#include "./led/led.h"
-#include "lvgl.h"
-#include "stdio.h"
-#include "string.h"
 #include "semphr.h"
-#include "lv_port_disp_template.h"
-#include "lv_port_indev_template.h"
 #include "queue.h"
+
+/*hardware driver */
+#include "./led/led.h"
+
+
+/*lvgl driver */
+#include "lvgl.h"
+#include "lv_port_disp.h"
+#include "lv_port_indev.h"
+
+
+/*fatfs driver */
 #include "fatfs.h"
 #include "ff.h"
 
@@ -41,10 +48,12 @@
 #include "mp3Player.h"
 #include "math.h"
 
-
 #define scr_act_width() lv_obj_get_width(lv_scr_act())
 #define scr_act_height() lv_obj_get_height(lv_scr_act())
 
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -196,18 +205,21 @@ void LED_Process(void *params)
 
 void LVGL_Process(void* param)
 {
+    printf("[LVGL] Initializing LVGL...\r\n");
+    
     lv_init();                    /* lvgl系统初始化 */ 
+    printf("[LVGL] lv_init() done\r\n");
 
     lv_port_disp_init();          /* lvgl显示接口初始化,放在lv_init()的后面 */ 
+    printf("[LVGL] Display initialized\r\n");
+    
     lv_port_indev_init();         /* lvgl输入接口初始化,放在lv_init()的后面 */ 
+    printf("[LVGL] Input device initialized\r\n");
 	
+    static lv_obj_t *switch_cool;            /* 制冷模式开关 */
+    static const lv_font_t *font = &lv_font_montserrat_14;  /* 初始化字体 */
 
-
-		static lv_obj_t *switch_cool;            /* 制冷模式开关 */
-		static const lv_font_t *font;            /* 定义字体 */
-
-		
- /* 制冷模式基础对象（矩形背景） */
+    /* 制冷模式基础对象(矩形背景) */
     lv_obj_t *obj_cool = lv_obj_create(lv_scr_act());                               /* 创建基础对象 */
     lv_obj_set_size(obj_cool,scr_act_height() / 3, scr_act_height() / 3 );          /* 设置大小 */
     lv_obj_align(obj_cool, LV_ALIGN_CENTER, -scr_act_width() / 4, 0 );              /* 设置位置 */
@@ -223,13 +235,15 @@ void LVGL_Process(void* param)
     lv_obj_set_size(switch_cool,scr_act_height() / 6, scr_act_height() / 12 );      /* 设置大小 */
     lv_obj_align(switch_cool, LV_ALIGN_CENTER, 0, scr_act_height() / 16 );          /* 设置位置 */
 
-	  lv_obj_add_event_cb(switch_cool, switch_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(switch_cool, switch_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    
+    printf("[LVGL] UI created, entering main loop...\r\n");
 
-	while(1)
-	{
-		vTaskDelay(5);
-		lv_timer_handler();
-	}
+    while(1)
+    {
+        vTaskDelay(5);  /* 5ms延迟,与LVGL定时器周期匹配 */
+        lv_timer_handler();
+    }
 }
 
 /* 文件系统任务：负责驱动链接、挂载与一次性读写验证 */

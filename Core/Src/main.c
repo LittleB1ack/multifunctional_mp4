@@ -43,10 +43,7 @@
 /* 音频相关头文件 */
 #include "./wm8978/bsp_wm8978.h"
 
-/* LVGL 相关头文件 */
-#include "lvgl.h"
-#include "lv_port_disp_template.h"
-#include "lv_port_indev_template.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

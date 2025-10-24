@@ -269,16 +269,17 @@ void DMA2_Stream6_IRQHandler(void)
 }
 
 /* USER CODE BEGIN 1 */
-void GTP_IRQHandler(void)
+
+/**
+  * @brief This function handles EXTI line[9:5] interrupts (触控中断 PG8).
+  */
+void EXTI9_5_IRQHandler(void)
 {
-	
-	
 	if(__HAL_GPIO_EXTI_GET_IT(GTP_INT_GPIO_PIN) != RESET) //确保是否产生了EXTI Line中断
 	{
 		GTP_TouchProcess();    
 		__HAL_GPIO_EXTI_CLEAR_IT(GTP_INT_GPIO_PIN);       //清除中断标志位
 	}  
-	
 }
 
 

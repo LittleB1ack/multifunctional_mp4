@@ -254,6 +254,7 @@ void mp3PlayerDemo(const char *mp3file)
 		/* 等待DMA传输完成 */
 		if (frames <= 5) {
 			printf("[MP3] Waiting for DMA (Isread=%d, bufflag=%d)...\r\n", Isread, bufflag);
+		}
 		/* 等待DMA传输完成 */
 		uint32_t timeout = 0;
 		while (Isread == 0)
