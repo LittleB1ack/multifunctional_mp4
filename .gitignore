@@ -1,0 +1,36 @@
+# Ignore common build artifacts and temporary files
+
+# Object and dependency files
+**/*.o
+**/*.d
+
+# Keil/MDK build artifacts
+**/*.hex
+**/*.axf
+**/*.crf
+**/*.lst
+**/*.map
+
+# Assembly and linker generated
+**/*.s
+
+# Temporary and editor files
+*.tmp
+*.log
+*.bak
+*.swp
+
+# VSCode
+.vscode/
+
+# Build folders
+MDK-ARM/my_f407rtos/
+MDK-ARM/*.hex
+MDK-ARM/**/*.o
+
+# Middlewares generated artifacts (if you want to keep sources, don't ignore .c/.h)
+Middlewares/**/generated/*.o
+Middlewares/**/generated/*.crf
+
+# PlatformIO/other
+.pio/
