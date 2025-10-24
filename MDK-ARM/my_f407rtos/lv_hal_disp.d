@@ -1,6 +1,7 @@
 my_f407rtos\lv_hal_disp.o: ..\Middlewares\Third_Party\LVGL\lvgl\src\hal\lv_hal_disp.c
 my_f407rtos\lv_hal_disp.o: F:\Keli5 MDK\ARM\ARMCC\Bin\..\include\stdint.h
 my_f407rtos\lv_hal_disp.o: F:\Keli5 MDK\ARM\ARMCC\Bin\..\include\stddef.h
+my_f407rtos\lv_hal_disp.o: F:\Keli5 MDK\ARM\ARMCC\Bin\..\include\stdio.h
 my_f407rtos\lv_hal_disp.o: ..\Middlewares\Third_Party\LVGL\lvgl\src\hal\lv_hal.h
 my_f407rtos\lv_hal_disp.o: ..\Middlewares\Third_Party\LVGL\lvgl\src\hal\lv_hal_disp.h
 my_f407rtos\lv_hal_disp.o: F:\Keli5 MDK\ARM\ARMCC\Bin\..\include\stdbool.h

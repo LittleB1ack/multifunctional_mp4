@@ -130,3 +130,4 @@ my_f407rtos\lv_qrcode.o: ..\Middlewares\Third_Party\LVGL\lvgl\src\extra\libs\qrc
 my_f407rtos\lv_qrcode.o: ..\Middlewares\Third_Party\LVGL\lvgl\src\extra\libs\qrcode\../../../../src/extra/widgets/led/lv_led.h
 my_f407rtos\lv_qrcode.o: ..\Middlewares\Third_Party\LVGL\lvgl\src\extra\libs\qrcode\../../../../src/extra/widgets/imgbtn/lv_imgbtn.h
 my_f407rtos\lv_qrcode.o: ..\Middlewares\Third_Party\LVGL\lvgl\src\extra\libs\qrcode\../../../../src/extra/widgets/span/lv_span.h
+my_f407rtos\lv_qrcode.o: ..\Middlewares\Third_Party\LVGL\lvgl\src\extra\libs\qrcode\qrcodegen.h

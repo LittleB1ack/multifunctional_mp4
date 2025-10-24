@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F407xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../Drivers/BSP_Driver;../Middlewares;..\Middlewares/Third_Party/LVGL;../Middlewares/Third_Party/LVGL/lvgl;../Middlewares/Third_Party/LVGL/lvgl/src;../Middlewares/Third_Party/LVGL/lvgl/examples/porting;../Drivers/BSP_Driver/LCD;../Drivers/BSP_Driver/TOUCH;../Drivers/SYSTEM;../Drivers/SYSTEM/delay;../Drivers/SYSTEM/sys;../Drivers/SYSTEM/usart;..\Middlewares\LVGL\GUI_APP\GUI_FONT;..\Middlewares\LVGL\GUI_APP;..\Drivers\BSP_Driver\flash;..\Drivers\BSP_Driver\font;..\Drivers\BSP_Driver;..\Drivers\BSP_Driver\lcd;..\Drivers\BSP_Driver\touch;..\Middlewares\Third_Party\FatFs;..\Middlewares\Third_Party\FatFs\App;..\Middlewares\Third_Party\FatFs\src;..\Middlewares\Third_Party\FatFs\src\option;..\Middlewares\Third_Party\FatFs\Target;..\Middlewares\Third_Party\mp3;..\Middlewares\Third_Party\mp3\APP;..\Middlewares\Third_Party\mp3\pub;..\Middlewares\Third_Party\mp3\real;..\Middlewares\Third_Party\mp3\real\arm</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../Drivers/BSP_Driver;../Drivers/BSP_Driver/LCD;../Drivers/BSP_Driver/TOUCH;../Drivers/SYSTEM;../Drivers/SYSTEM/delay;../Drivers/SYSTEM/sys;../Drivers/SYSTEM/usart;..\Drivers\BSP_Driver\flash;..\Drivers\BSP_Driver\font;..\Drivers\BSP_Driver;..\Drivers\BSP_Driver\lcd;..\Drivers\BSP_Driver\touch;../Middlewares;..\Middlewares\Third_Party\FatFs;..\Middlewares\Third_Party\FatFs\App;..\Middlewares\Third_Party\FatFs\src;..\Middlewares\Third_Party\FatFs\src\option;..\Middlewares\Third_Party\FatFs\Target;..\Middlewares\Third_Party\mp3;..\Middlewares\Third_Party\mp3\APP;..\Middlewares\Third_Party\mp3\pub;..\Middlewares\Third_Party\mp3\real;..\Middlewares\Third_Party\mp3\real\arm;..\Middlewares\Third_Party\LVGL;..\Middlewares\Third_Party\LVGL\lvgl;..\Middlewares\Third_Party\LVGL\lvgl\src;../Middlewares/Third_Party/LVGL/lvgl/examples/porting;..\Middlewares\Third_Party\LVGL\GUI;..\Middlewares\Third_Party\LVGL\GUI\src;..\Middlewares\Third_Party\LVGL\GUI\src\custom;..\Middlewares\Third_Party\LVGL\GUI\src\generated;..\Middlewares\Third_Party\LVGL\GUI\src\generated\guider_customer_fonts;..\Middlewares\Third_Party\LVGL\GUI\src\generated\guider_fonts;..\Middlewares\Third_Party\LVGL\GUI\src\generated\images</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2020,7 +2020,74 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>LVGL/myGUI</GroupName>
+          <GroupName>LVGL_APP</GroupName>
+          <Files>
+            <File>
+              <FileName>custom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\LVGL\GUI\src\custom\custom.c</FilePath>
+            </File>
+            <File>
+              <FileName>lv_font_montserratMedium_12.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\LVGL\GUI\src\generated\guider_fonts\lv_font_montserratMedium_12.c</FilePath>
+            </File>
+            <File>
+              <FileName>lv_font_montserratMedium_16.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\LVGL\GUI\src\generated\guider_fonts\lv_font_montserratMedium_16.c</FilePath>
+            </File>
+            <File>
+              <FileName>lv_font_montserratMedium_20.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\LVGL\GUI\src\generated\guider_fonts\lv_font_montserratMedium_20.c</FilePath>
+            </File>
+            <File>
+              <FileName>lv_font_montserratMedium_24.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\LVGL\GUI\src\generated\guider_fonts\lv_font_montserratMedium_24.c</FilePath>
+            </File>
+            <File>
+              <FileName>lv_font_montserratMedium_40.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\LVGL\GUI\src\generated\guider_fonts\lv_font_montserratMedium_40.c</FilePath>
+            </File>
+            <File>
+              <FileName>lv_font_SourceHanSerifSC_Regular_40.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\LVGL\GUI\src\generated\guider_fonts\lv_font_SourceHanSerifSC_Regular_40.c</FilePath>
+            </File>
+            <File>
+              <FileName>_1_alpha_157x200.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\LVGL\GUI\src\generated\images\_1_alpha_157x200.c</FilePath>
+            </File>
+            <File>
+              <FileName>widgets_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\LVGL\GUI\src\generated\widgets_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>events_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\LVGL\GUI\src\generated\events_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_guider.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\LVGL\GUI\src\generated\gui_guider.c</FilePath>
+            </File>
+            <File>
+              <FileName>setup_scr_screen_1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\LVGL\GUI\src\generated\setup_scr_screen_1.c</FilePath>
+            </File>
+            <File>
+              <FileName>setup_scr_screen.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\Third_Party\LVGL\GUI\src\generated\setup_scr_screen.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>FatFS/src</GroupName>

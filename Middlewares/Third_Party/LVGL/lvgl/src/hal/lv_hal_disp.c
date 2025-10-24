@@ -10,6 +10,7 @@
  *********************/
 #include <stdint.h>
 #include <stddef.h>
+#include <stdio.h>
 #include "lv_hal.h"
 #include "../misc/lv_mem.h"
 #include "../misc/lv_gc.h"
@@ -165,21 +166,35 @@ void lv_disp_draw_buf_init(lv_disp_draw_buf_t * draw_buf, void * buf1, void * bu
  */
 lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 {
+    printf("[LVGL_HAL] lv_disp_drv_register: ENTER\r\n");
+    
     lv_disp_t * disp = _lv_ll_ins_head(&LV_GC_ROOT(_lv_disp_ll));
+    printf("[LVGL_HAL] _lv_ll_ins_head returned: 0x%08X\r\n", (unsigned int)disp);
+    
     LV_ASSERT_MALLOC(disp);
     if(!disp) {
+        printf("[LVGL_HAL] ERROR: disp allocation failed!\r\n");
         return NULL;
     }
 
     /*Create a draw context if not created yet*/
     if(driver->draw_ctx == NULL) {
+        printf("[LVGL_HAL] Allocating draw context (size=%d)...\r\n", driver->draw_ctx_size);
         lv_draw_ctx_t * draw_ctx = lv_mem_alloc(driver->draw_ctx_size);
+        printf("[LVGL_HAL] draw_ctx = 0x%08X\r\n", (unsigned int)draw_ctx);
+        
         LV_ASSERT_MALLOC(draw_ctx);
-        if(draw_ctx == NULL) return NULL;
+        if(draw_ctx == NULL) {
+            printf("[LVGL_HAL] ERROR: draw_ctx allocation failed!\r\n");
+            return NULL;
+        }
+        printf("[LVGL_HAL] Calling draw_ctx_init...\r\n");
         driver->draw_ctx_init(driver, draw_ctx);
+        printf("[LVGL_HAL] draw_ctx_init done\r\n");
         driver->draw_ctx = draw_ctx;
     }
 
+    printf("[LVGL_HAL] Clearing disp structure...\r\n");
     lv_memset_00(disp, sizeof(lv_disp_t));
 
     disp->driver = driver;

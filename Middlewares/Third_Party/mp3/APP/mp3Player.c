@@ -94,7 +94,7 @@ void mp3PlayerDemo(const char *mp3file)
 	
 	mp3player.ucFreq = I2S_AUDIOFREQ_DEFAULT;
 	mp3player.ucStatus = STA_IDLE;
-	mp3player.ucVolume = 25;
+	mp3player.ucVolume = 15;
 	
 	result = f_open(&file, mp3file, FA_READ);
 	if (result != FR_OK)

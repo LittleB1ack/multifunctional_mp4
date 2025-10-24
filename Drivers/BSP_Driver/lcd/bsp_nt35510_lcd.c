@@ -25,7 +25,7 @@ uint16_t LCD_Y_LENGTH = NT35510_LESS_PIXEL;
 //液晶屏扫描模式，本变量主要用于方便选择触摸屏的计算参数
 //参数可选值为0-7
 //调用NT35510_GramScan函数设置方向时会自动更改
-//LCD刚初始化完成时会使用本默认值
+//kyLCD刚初始化完成时会使用本默认值
 uint8_t LCD_SCAN_MODE = 3 ;
 
 
