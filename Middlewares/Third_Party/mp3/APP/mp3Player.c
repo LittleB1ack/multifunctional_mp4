@@ -79,12 +79,6 @@ UINT bw;            					/* File R/W count */
 /* 仅允许本文件内调用的函数声明 */
 void MP3Player_I2S_DMA_TX_Callback(void);
 
-/* 仅允许本文件内调用的函数声明 */
-void MP3Player_I2S_DMA_TX_Callback(void);
-
-/* DMA回调计数器(全局,用于调试) */
-static uint32_t g_mp3_dma_callback_count = 0;
-
 /**
   * @brief   MP3格式音频播放主程序(参考原版工程简化实现)
   * @param  mp3file: MP3文件路径
@@ -96,33 +90,28 @@ void mp3PlayerDemo(const char *mp3file)
 	uint32_t frames = 0;
 	int err = 0, i = 0, outputSamps = 0;	
 	int	read_offset = 0;		/* 读偏移指针 */
-	int	bytes_left = 0;			/* 剩余字节数 */	
-	
-	/* 重置DMA回调计数器,以便看到新的日志 */
-	g_mp3_dma_callback_count = 0;
+	int	bytes_left = 0;			/* 剩余字节数 */
 	
 	mp3player.ucFreq = I2S_AUDIOFREQ_DEFAULT;
 	mp3player.ucStatus = STA_IDLE;
-	mp3player.ucVolume = 40;
+	mp3player.ucVolume = 25;
 	
 	result = f_open(&file, mp3file, FA_READ);
 	if (result != FR_OK)
 	{
-		printf("Open mp3file :%s fail!!!->%d\r\n", mp3file, result);
+		printf("[MP3] Open failed: %s (err=%d)\r\n", mp3file, result);
 		result = f_close(&file);
 		return;	/* 停止播放 */
 	}
-	printf("当前播放文件 -> %s\n", mp3file);
-	printf("文件大小: %lu bytes (%.2f KB)\r\n", f_size(&file), f_size(&file) / 1024.0f);
+	printf("[MP3] Playing: %s (%.2f KB)\r\n", mp3file, f_size(&file) / 1024.0f);
 	
 	//初始化MP3解码器
 	Mp3Decoder = MP3InitDecoder();	
 	if (Mp3Decoder == 0)
 	{
-		printf("初始化helix解码库失败\n");
+		printf("[MP3] Decoder init failed\r\n");
 		return;	/* 停止播放 */
 	}
-	printf("初始化中...\n");
 	
 	
 	delay_ms(10);	/* 延迟一段时间，等待I2S中断结束 */
@@ -137,32 +126,23 @@ void mp3PlayerDemo(const char *mp3file)
 	wm8978_CfgAudioIF(I2S_STANDARD_PHILIPS, 16);
 	
 	/*  初始化并配置I2S（参考原版工程）  */
-	printf("[MP3] Stopping I2S...\r\n");
 	I2S_Stop();
-	printf("[MP3] Configuring I2S GPIO...\r\n");
 	I2S_GPIO_Config();
-	printf("[MP3] Configuring I2S mode (freq=%lu)...\r\n", mp3player.ucFreq);
 	I2Sx_Mode_Config(I2S_STANDARD_PHILIPS, I2S_DATAFORMAT_16B, mp3player.ucFreq);	
-	printf("[MP3] Setting DMA callback...\r\n");
 	I2S_DMA_TX_Callback = MP3Player_I2S_DMA_TX_Callback;
-	printf("[MP3] Initializing DMA (buf0=0x%08lX, buf1=0x%08lX, size=%d)...\r\n",
-	       (uint32_t)&outbuffer[0], (uint32_t)&outbuffer[1], MP3BUFFER_SIZE);
 	I2Sx_TX_DMA_Init((uint32_t)&outbuffer[0], (uint32_t)&outbuffer[1], MP3BUFFER_SIZE);	
 	
 	bufflag = 0;
 	Isread = 0;
 	
-	printf("[MP3] Starting playback...\r\n");
 	mp3player.ucStatus = STA_PLAYING;		/* 放音状态 */
-	printf("[MP3] Reading initial data from file...\r\n");
 	result = f_read(&file, inputbuf, INPUTBUF_SIZE, &bw);
 	if (result != FR_OK)
 	{
-		printf("读取%s失败 -> %d\r\n", mp3file, result);
+		printf("[MP3] Read failed (err=%d)\r\n", result);
 		MP3FreeDecoder(Mp3Decoder);
 		return;
 	}
-	printf("[MP3] Read %u bytes initially\r\n", bw);
 	read_ptr = inputbuf;
 	bytes_left = bw;
 	
@@ -170,7 +150,6 @@ void mp3PlayerDemo(const char *mp3file)
 	bufflag = 0;
 	
 	/* 进入主程序循环体（原版工程的简单方式） */
-	printf("[MP3] Entering main decode loop (initial: Isread=%d, bufflag=%d)...\r\n", Isread, bufflag);
 	while (mp3player.ucStatus == STA_PLAYING)
 	{
 		read_offset = MP3FindSyncWord(read_ptr, bytes_left);	//寻找帧同步，返回第一个同步字的位置
@@ -179,7 +158,7 @@ void mp3PlayerDemo(const char *mp3file)
 			result = f_read(&file, inputbuf, INPUTBUF_SIZE, &bw);
 			if (result != FR_OK)
 			{
-				printf("读取%s失败 -> %d\r\n", mp3file, result);
+				printf("[MP3] Read error: %d\r\n", result);
 				break;
 			}
 			read_ptr = inputbuf;
@@ -198,34 +177,26 @@ void mp3PlayerDemo(const char *mp3file)
 			result = f_read(&file, inputbuf + bytes_left + i, INPUTBUF_SIZE - bytes_left - i, &bw);//补充数据
 			if (result != FR_OK)
 			{
-				printf("读取%s失败 -> %d\r\n", mp3file, result);
+				printf("[MP3] Read error: %d\r\n", result);
 				break;
 			}
 			bytes_left += bw;	//有效数据流大小
 		}
 		err = MP3Decode(Mp3Decoder, &read_ptr, &bytes_left, outbuffer[bufflag], 0);	//bufflag开始解码
-		frames++;	
-		if (frames <= 3) {
-			printf("[MP3] Frame #%lu decoded to buffer[%d]\r\n", frames, bufflag);
-		} else if (frames == 4) {
-			printf("[MP3] (后续帧解码省略输出)\r\n");
-		}
+		frames++;
 		if (err != ERR_MP3_NONE)	//错误处理
 		{
 			switch (err)
 			{
 				case ERR_MP3_INDATA_UNDERFLOW:
-					printf("ERR_MP3_INDATA_UNDERFLOW\r\n");
 					result = f_read(&file, inputbuf, INPUTBUF_SIZE, &bw);
 					read_ptr = inputbuf;
 					bytes_left = bw;
 					break;		
 				case ERR_MP3_MAINDATA_UNDERFLOW:
 					/* do nothing - next call to decode will provide more mainData */
-					printf("ERR_MP3_MAINDATA_UNDERFLOW\r\n");
 					break;		
 				default:
-					printf("UNKNOWN ERROR:%d\r\n", err);		
 					// 跳过此帧
 					if (bytes_left > 0)
 					{
@@ -258,34 +229,19 @@ void mp3PlayerDemo(const char *mp3file)
 			/* 根据解码信息设置采样率 */
 			if (Mp3FrameInfo.samprate != mp3player.ucFreq)	//采样率 
 			{
-				printf("[MP3] Sample rate changed: %lu -> %d Hz\r\n", 
-				       mp3player.ucFreq, Mp3FrameInfo.samprate);
 				mp3player.ucFreq = Mp3FrameInfo.samprate;
+				printf("[MP3] %dHz %dkbps %dch\r\n", 
+				       Mp3FrameInfo.samprate, Mp3FrameInfo.bitrate/1000, Mp3FrameInfo.nChans);
 				
-				printf(" \r\n Bitrate       %dKbps", Mp3FrameInfo.bitrate/1000);
-				printf(" \r\n Samprate      %dHz", mp3player.ucFreq);
-				printf(" \r\n BitsPerSample %db", Mp3FrameInfo.bitsPerSample);
-				printf(" \r\n nChans        %d", Mp3FrameInfo.nChans);
-				printf(" \r\n Layer         %d", Mp3FrameInfo.layer);
-				printf(" \r\n Version       %d", Mp3FrameInfo.version);
-				printf(" \r\n OutputSamps   %d", Mp3FrameInfo.outputSamps);
-				printf("\r\n");
 				if (mp3player.ucFreq >= I2S_AUDIOFREQ_DEFAULT)	//正常的帧,每次都要改速率
 				{
-				Isread = 0;  /* 重置标志,等待DMA完成第1帧 */
-				bufflag = 0;  /* 重置bufflag,第1帧在buffer[0] */					
-				Isread = 0;  /* 重置标志,等待DMA完成第1帧 */
-				bufflag = 0;  /* 重置bufflag,第1帧在buffer[0] */
+					Isread = 0;  /* 重置标志,等待DMA完成第1帧 */
+					bufflag = 0;  /* 重置bufflag,第1帧在buffer[0] */
 					
-					
-					printf("[MP3] Reconfiguring I2S mode...\r\n");
 					I2Sx_Mode_Config(I2S_STANDARD_PHILIPS, I2S_DATAFORMAT_16B, mp3player.ucFreq);
-					printf("[MP3] Reinitializing DMA (outputSamps=%d)...\r\n", outputSamps);
 					I2Sx_TX_DMA_Init((uint32_t)&outbuffer[0], (uint32_t)&outbuffer[1], outputSamps);
+					I2S_Play_Start();
 				}
-				printf("[MP3] Starting I2S playback...\r\n");
-
-				I2S_Play_Start();
 			}
 		}//else 解码正常
 		
@@ -298,28 +254,26 @@ void mp3PlayerDemo(const char *mp3file)
 		/* 等待DMA传输完成 */
 		if (frames <= 5) {
 			printf("[MP3] Waiting for DMA (Isread=%d, bufflag=%d)...\r\n", Isread, bufflag);
-		}
+		/* 等待DMA传输完成 */
 		uint32_t timeout = 0;
 		while (Isread == 0)
 		{
+			/* 在FreeRTOS环境下让出CPU，避免忙等待 */
+			vTaskDelay(1);  /* 延迟1个tick (~1ms) */
 			timeout++;
-			if (timeout > 10000000) {
-				printf("[MP3] ERROR: DMA timeout! Isread still 0\r\n");
+			if (timeout > 5000) {  /* 5000 ticks = ~5秒超时 */
+				printf("[MP3] DMA timeout!\r\n");
 				mp3player.ucStatus = STA_IDLE;
 				break;
 			}
 		}
-		if (frames <= 5) {
-			printf("[MP3] DMA completed, continuing (Isread=%d)\r\n", Isread);
-		}
 		Isread = 0;
 	}
-	printf("[MP3] Stopping playback...\r\n");
 	I2S_Stop();
 	mp3player.ucStatus = STA_IDLE;
 	MP3FreeDecoder(Mp3Decoder);
 	f_close(&file);	
-	printf("[MP3] Playback stopped, decoder freed\r\n");
+	printf("[MP3] Playback finished\r\n");
 }
 
 /**
@@ -331,8 +285,6 @@ void MP3Player_I2S_DMA_TX_Callback(void)
 {
 	uint8_t ct;
 	
-	g_mp3_dma_callback_count++;
-	
 	/* 获取DMA当前目标(CT位): 0=Memory0, 1=Memory1 */
 	ct = I2S_DMA_Get_CurrentTarget();
 	
@@ -343,12 +295,6 @@ void MP3Player_I2S_DMA_TX_Callback(void)
 	else  /* DMA正在使用Memory0 */
 	{
 		bufflag = 1;  /* CPU写入Memory1 */
-	}
-	
-	if (g_mp3_dma_callback_count <= 5) {
-		printf("[MP3_DMA] Callback #%lu, CT=%d, bufflag=%d, Isread->1\r\n", g_mp3_dma_callback_count, ct, bufflag);
-	} else if (g_mp3_dma_callback_count == 6) {
-		printf("[MP3_DMA] (后续回调省略输出)\r\n");
 	}
 	
 	Isread = 1;

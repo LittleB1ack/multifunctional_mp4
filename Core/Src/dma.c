@@ -44,10 +44,10 @@ void MX_DMA_Init(void)
 
   /* 对齐 FreeRTOS_FATFS：SDIO 使用 DMA2 Stream3(RX)/Stream6(TX)，优先级 7 */
   /* DMA2_Stream3_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 7, 0);
+  HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 6, 0);
   HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
   /* DMA2_Stream6_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream6_IRQn, 7, 0);
+  HAL_NVIC_SetPriority(DMA2_Stream6_IRQn, 6, 0);
   HAL_NVIC_EnableIRQ(DMA2_Stream6_IRQn);
 
 

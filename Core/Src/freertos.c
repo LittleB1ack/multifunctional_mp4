@@ -254,29 +254,6 @@ void FS_Process(void *params)
   }
   if (fr == FR_OK) {
     printf("[FS] mount OK on %s\r\n", SDPath);
-    /* 简单读写验证 */
-    FIL fp;
-    UINT bw = 0;
-    printf("[FS] Testing write...\r\n");
-    if (f_open(&fp, "0:/hello.txt", FA_WRITE | FA_CREATE_ALWAYS) == FR_OK) {
-      const char *msg = "Hello, FatFs + FreeRTOS!\r\n";
-      f_write(&fp, msg, (UINT)strlen(msg), &bw);
-      f_close(&fp);
-      printf("[FS] write %u bytes\r\n", bw);
-    } else {
-      printf("[FS] write failed!\r\n");
-    }
-    
-    printf("[FS] Testing read...\r\n");
-    if (f_open(&fp, "0:/hello.txt", FA_READ) == FR_OK) {
-      char buf[64] = {0};
-      UINT br = 0;
-      f_read(&fp, buf, sizeof(buf)-1, &br);
-      f_close(&fp);
-      printf("[FS] read %u bytes: %s", br, buf);
-    } else {
-      printf("[FS] read failed!\r\n");
-    }
     
     /* 文件系统已就绪，释放信号量通知其他任务 */
     printf("[FS] Giving semaphore (handle=0x%08lX)...\r\n", (uint32_t)fsReadySemaphore);
@@ -286,7 +263,6 @@ void FS_Process(void *params)
     } else {
         printf("[FS] ERROR: Semaphore is NULL!\r\n");
     }
-
   } else {
     printf("[FS] mount failed: %d\r\n", fr);
   }
@@ -299,12 +275,26 @@ void Audio_Test_Task(void *params)
 {
  /* 等待文件系统就绪 */
     xSemaphoreTake(fsReadySemaphore, portMAX_DELAY);
-    
-    /* 播放测试音(可选) */
-    mp3TestTone(440, 1);  // 440Hz,1秒
-    
+      
+  /* 初始化 WM8978 音频编解码芯片 */
+  printf("\r\n------------------------------------------------------------\r\n");
+  printf("WM8978 Audio Codec Initialization\r\n");
+  printf("------------------------------------------------------------\r\n");
+  if (wm8978_Init() == 0)
+  {
+    printf("[WM8978] ERROR: Chip not detected!\r\n");
+    printf("[WM8978] Please check:\r\n");
+    printf("         - I2C connections (PB8/PB9)\r\n");
+    printf("         - WM8978 power supply\r\n");
+    printf("         - Pull-up resistors on I2C lines\r\n");
+  }
+  else
+  {
+    printf("[WM8978] Chip detected and initialized successfully\r\n");
+  }
+    vTaskDelay(pdMS_TO_TICKS(1000));
     /* 播放 MP3 文件 */
-    mp3PlayerDemo("0:/test.mp3");
+    mp3PlayerDemo("0:/mp3/张国荣-玻璃之情.mp3");
     
     /* 播放结束后的清理 */
     vTaskDelay(pdMS_TO_TICKS(1000));

@@ -92,6 +92,7 @@ my_f407rtos\main.o: ../Drivers/BSP_Driver/bsp_debug_usart.h
 my_f407rtos\main.o: ../Core/Src/../../Middlewares/Third_Party/FatFs/Target/bsp_driver_sd.h
 my_f407rtos\main.o: ../Drivers/BSP_Driver/./sdram/bsp_sdram.h
 my_f407rtos\main.o: ../Drivers/BSP_Driver/./usart/bsp_debug_usart.h
+my_f407rtos\main.o: ../Drivers/BSP_Driver/./wm8978/bsp_wm8978.h
 my_f407rtos\main.o: ../Middlewares/LVGL/GUI/lvgl/lvgl.h
 my_f407rtos\main.o: ../Middlewares/LVGL/GUI/lvgl/src/misc/lv_log.h
 my_f407rtos\main.o: ../Middlewares/LVGL/GUI/lvgl/src/misc/../lv_conf_internal.h
