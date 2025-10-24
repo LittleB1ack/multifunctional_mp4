@@ -40,10 +40,10 @@
 #include "../../Middlewares/Third_Party/FatFs/Target/bsp_driver_sd.h"
 #include "./sdram/bsp_sdram.h"  
 
-/* LVGL 相关头文件 */
-#include "lvgl.h"
-#include "lv_port_disp_template.h"
-#include "lv_port_indev_template.h"
+/* 音频相关头文件 */
+#include "./wm8978/bsp_wm8978.h"
+
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -126,6 +126,7 @@ int main(void)
   /* 打印内存布局摘要 - 用于资源分配诊断 */
   printf("\r\n");
   // sram_print_init_summary(); // 暂时注释，因为EXTSRAM测试失败
+
 	
   /* USER CODE BEGIN 2 */
   /* 按 HAL 要求先初始化 DMA 与 SDIO（配置 hsd、打开 SDIO 时钟/DMA 时钟/中断），再调用 BSP_SD_Init */

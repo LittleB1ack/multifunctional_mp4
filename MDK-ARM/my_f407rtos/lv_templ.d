@@ -1,1 +1,1 @@
-my_f407rtos\lv_templ.o: ..\Middlewares\LVGL\GUI\lvgl\src\misc\lv_templ.c
+my_f407rtos\lv_templ.o: ..\Middlewares\Third_Party\LVGL\lvgl\src\misc\lv_templ.c

@@ -1270,7 +1270,7 @@ void I2Sx_TX_DMA_Init(const uint32_t buffer0,const uint32_t buffer1,const uint32
   hdma_spi2_tx.XferErrorCallback = I2S_DMAError;
 
 	/* 必须在启动 DMA 前设置中断优先级 */
-	HAL_NVIC_SetPriority(I2Sx_TX_DMA_STREAM_IRQn, 5, 0);  /* 避免与 FreeRTOS 冲突 */
+	HAL_NVIC_SetPriority(I2Sx_TX_DMA_STREAM_IRQn, 7, 0);  /* 避免与 FreeRTOS 冲突 */
 	HAL_NVIC_EnableIRQ(I2Sx_TX_DMA_STREAM_IRQn);
 
 	printf("[DMA] Starting DMA double-buffer transfer...\r\n");
