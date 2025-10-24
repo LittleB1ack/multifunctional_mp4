@@ -12,6 +12,7 @@
 #include "lv_port_disp.h"
 #include "../../lvgl.h"
 #include <stdbool.h>
+#include <stdio.h>
 #include "bsp_nt35510_lcd.h"
 #include "./sdram/mem_placement.h"        /* 外部 SRAM 内存放置宏 */
 
@@ -92,9 +93,9 @@ void lv_port_disp_init(void)
 
     /* Example for 2) */
     static lv_disp_draw_buf_t draw_buf_dsc_2;
-    static EXTSRAM lv_color_t buf_2_1[MY_DISP_HOR_RES * 10];                        /*A buffer for 10 rows*/
-    static EXTSRAM lv_color_t buf_2_2[MY_DISP_HOR_RES * 10];                        /*An other buffer for 10 rows*/
-    lv_disp_draw_buf_init(&draw_buf_dsc_2, buf_2_1, buf_2_2, MY_DISP_HOR_RES * 10);   /*Initialize the display buffer*/
+    static EXTSRAM lv_color_t buf_2_1[MY_DISP_HOR_RES * 30];  /* 30行缓冲,优先级调整后可以使用 */
+    static EXTSRAM lv_color_t buf_2_2[MY_DISP_HOR_RES * 30];  /* 30行缓冲,优先级调整后可以使用 */
+    lv_disp_draw_buf_init(&draw_buf_dsc_2, buf_2_1, buf_2_2, MY_DISP_HOR_RES * 30);   /*Initialize the display buffer*/
 
 //    /* Example for 3) also set disp_drv.full_refresh = 1 below*/
 //    static lv_disp_draw_buf_t draw_buf_dsc_3;
@@ -141,7 +142,9 @@ void lv_port_disp_init(void)
 /*Initialize your display and the required peripherals.*/
 static void disp_init(void)
 {
+    printf("[DISP] Initializing NT35510 LCD...\r\n");
     NT35510_Init();
+    printf("[DISP] NT35510 initialized successfully\r\n");
     /*You code here*/
 }
 
@@ -166,17 +169,38 @@ void disp_disable_update(void)
  *'lv_disp_flush_ready()' has to be called when finished.*/
 static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
-   int32_t x,y;
-	for(y = area->y1;y<=area->y2;y++)
-	{
-		for(x = area->x1;x<=area->x2;x++)
-		{
-			/* color handled by NT35510_OpenWindow/Write_Data sequence, use SetPointPixel for position */
-      NT35510_SetColorPointPixel(x,y,color_p->full); 
-			color_p++;
-		}
-	}
-	lv_disp_flush_ready(disp_drv);
+    static uint32_t flush_count = 0;
+    flush_count++;
+    
+    /* 检查刷新是否启用 */
+    if(!disp_flush_enabled) {
+        lv_disp_flush_ready(disp_drv);
+        return;
+    }
+    
+    int32_t x, y;
+    uint32_t width = area->x2 - area->x1 + 1;
+    uint32_t height = area->y2 - area->y1 + 1;
+    
+    /* 每100次刷新打印一次调试信息 */
+    if(flush_count % 100 == 1) {
+        printf("[DISP_FLUSH #%u] Area:(%d,%d)-(%d,%d) Size:%lux%lu Pixels:%lu\r\n", 
+               (unsigned int)flush_count, area->x1, area->y1, area->x2, area->y2,
+               (unsigned long)width, (unsigned long)height, (unsigned long)(width*height));
+    }
+    
+    /* 使用完全可靠的逐像素方式 - NT35510硬件限制,无法批量优化 */
+    for(y = area->y1; y <= area->y2; y++)
+    {
+        for(x = area->x1; x <= area->x2; x++)
+        {
+            NT35510_SetColorPointPixel(x, y, color_p->full);
+            color_p++;
+        }
+    }
+    
+    /* 通知LVGL刷新完成 */
+    lv_disp_flush_ready(disp_drv);
 }
 
 /*OPTIONAL: GPU INTERFACE*/

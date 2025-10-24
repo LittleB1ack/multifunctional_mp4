@@ -129,13 +129,13 @@ void MX_FREERTOS_Init(void) {
 
   /* 创建 LED 任务 */
   xTaskCreate(LED_Process,"LED_Task",128,NULL,osPriorityNormal,NULL);
-  /* 创建 LVGL 任务 */
-  xTaskCreate(LVGL_Process,"LVGL_Task",512,NULL,osPriorityNormal,NULL);
+  /* 创建 LVGL 任务 - 降低优先级,避免阻塞音频 */
+  xTaskCreate(LVGL_Process,"LVGL_Task",512,NULL,osPriorityBelowNormal,NULL);
 
   /* FS 任务优先级设为 osPriorityAboveNormal，确保优先完成文件系统初始化 */
   xTaskCreate(FS_Process, "FS_Task", 512, NULL, osPriorityAboveNormal, NULL);
-  /* 创建音频任务，增加栈大小到2048，优先级设为 osPriorityNormal，等待文件系统就绪后再运行 */
-  xTaskCreate(Audio_Test_Task, "AudioTest", 2048, NULL, osPriorityBelowNormal, NULL); 
+  /* 创建音频任务 - 提高优先级到Normal,确保实时性 */
+  xTaskCreate(Audio_Test_Task, "AudioTest", 2048, NULL, osPriorityNormal, NULL); 
 
 
   /* add threads, ... */
@@ -181,6 +181,9 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
   taskDISABLE_INTERRUPTS();
   for(;;) { /* Trap here for debugging */ }
 }
+
+
+
 void LED_Process(void *params)
 {
   printf("[LED] LED_Process started\r\n");
@@ -216,18 +219,24 @@ void LVGL_Process(void* param)
     lv_port_indev_init();         /* lvgl输入接口初始化,放在lv_init()的后面 */ 
     printf("[LVGL] Input device initialized\r\n");
 	
+    /* 设置屏幕背景为白色,便于观察 */
+    lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0xFFFFFF), 0);
+    printf("[LVGL] Screen background set to WHITE\r\n");
+    
     static lv_obj_t *switch_cool;            /* 制冷模式开关 */
-    static const lv_font_t *font = &lv_font_montserrat_14;  /* 初始化字体 */
+    static const lv_font_t *font = &lv_font_montserrat_14;  /* 使用大字体,更明显 */
 
-    /* 制冷模式基础对象(矩形背景) */
+    /* 制冷模式基础对象(矩形背景) - 设置为蓝色便于观察 */
     lv_obj_t *obj_cool = lv_obj_create(lv_scr_act());                               /* 创建基础对象 */
     lv_obj_set_size(obj_cool,scr_act_height() / 3, scr_act_height() / 3 );          /* 设置大小 */
     lv_obj_align(obj_cool, LV_ALIGN_CENTER, -scr_act_width() / 4, 0 );              /* 设置位置 */
+    lv_obj_set_style_bg_color(obj_cool, lv_color_hex(0x0000FF), 0);  /* 蓝色背景 */
 
-    /* 制冷模式开关标签 */
+    /* 制冷模式开关标签 - 黑色文字 */
     lv_obj_t *label_cool = lv_label_create(obj_cool);                               /* 创建标签 */
     lv_label_set_text(label_cool, "Cool");                                          /* 设置文本内容 */
     lv_obj_set_style_text_font(label_cool, font, LV_STATE_DEFAULT);                 /* 设置字体 */
+    lv_obj_set_style_text_color(label_cool, lv_color_hex(0x000000), 0);  /* 黑色文字 */
     lv_obj_align(label_cool, LV_ALIGN_CENTER, 0, -scr_act_height() / 16 );          /* 设置位置 */
 
     /* 制冷模式开关 */
@@ -237,12 +246,19 @@ void LVGL_Process(void* param)
 
     lv_obj_add_event_cb(switch_cool, switch_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     
+    /* 添加测试标签 - 大号红色文字 */
+    lv_obj_t *label_test = lv_label_create(lv_scr_act());
+    lv_label_set_text(label_test, "LVGL TEST");
+    lv_obj_set_style_text_font(label_test, font, 0);
+    lv_obj_set_style_text_color(label_test, lv_color_hex(0xFF0000), 0);  /* 红色文字 */
+    lv_obj_align(label_test, LV_ALIGN_TOP_MID, 0, 20);
+    
     printf("[LVGL] UI created, entering main loop...\r\n");
 
     while(1)
     {
-        vTaskDelay(5);  /* 5ms延迟,与LVGL定时器周期匹配 */
-        lv_timer_handler();
+        lv_timer_handler();  /* 处理LVGL定时器 */
+        vTaskDelay(1);  /* 1ms延迟,提高刷新率 */
     }
 }
 

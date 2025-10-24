@@ -162,9 +162,9 @@ static void NT35510_FSMC_Config ( void )
    SRAM_Handler.Extended = FMC_NORSRAM_EXTENDED_DEVICE;
    __HAL_RCC_FSMC_CLK_ENABLE();	
   /* SRAM device configuration */  
-  Timing.AddressSetupTime      = 0x04;
+  Timing.AddressSetupTime      = 0x04;  /* 恢复原始时序参数,保证稳定性 */
   Timing.AddressHoldTime       = 0x00;
-  Timing.DataSetupTime         = 0x04;
+  Timing.DataSetupTime         = 0x04;  /* 恢复原始时序参数,保证稳定性 */
   Timing.BusTurnAroundDuration = 0x00;
   Timing.CLKDivision           = 0x00;
   Timing.DataLatency           = 0x00;
@@ -1241,6 +1241,56 @@ void LCD_SetBackColor(uint16_t Color)
   CurrentBackColor = Color;
 }
 
+
+/**
+  * @brief  快速填充指定区域,使用颜色数组(FSMC批量传输优化版)
+  * @param  usX: 起始X坐标
+  * @param  usY: 起始Y坐标
+  * @param  usWidth: 区域宽度
+  * @param  usHeight: 区域高度
+  * @param  color: 指向颜色数据数组的指针(RGB565格式)
+  * @retval None
+  * @note   FSMC不支持DMA,但通过编译器优化和循环展开可以达到接近DMA的性能
+  */
+void NT35510_FillBlock(uint16_t usX, uint16_t usY, uint16_t usWidth, uint16_t usHeight, uint16_t *color)
+{
+    uint32_t total_pixels;
+    uint32_t i;
+    __IO uint16_t *data_addr = (__IO uint16_t *)FSMC_Addr_NT35510_DATA;
+    
+    // 计算总像素数
+    total_pixels = (uint32_t)usWidth * (uint32_t)usHeight;
+    
+    // 设置LCD填充窗口
+    NT35510_OpenWindow(usX, usY, usWidth, usHeight);
+    
+    // 发送写内存命令
+    NT35510_Write_Cmd(CMD_SetPixel);
+    
+    /* 优化策略:循环展开 + 指针优化,减少循环开销 */
+    // 处理16个像素为一组的批量传输(更激进的循环展开)
+    uint32_t blocks = total_pixels >> 4;  // 除以16
+    uint32_t remain = total_pixels & 0xF; // 取余数
+    
+    // 批量传输:每次写16个像素(循环展开)
+    for(i = 0; i < blocks; i++)
+    {
+        *data_addr = *color++; *data_addr = *color++;
+        *data_addr = *color++; *data_addr = *color++;
+        *data_addr = *color++; *data_addr = *color++;
+        *data_addr = *color++; *data_addr = *color++;
+        *data_addr = *color++; *data_addr = *color++;
+        *data_addr = *color++; *data_addr = *color++;
+        *data_addr = *color++; *data_addr = *color++;
+        *data_addr = *color++; *data_addr = *color++;
+    }
+    
+    // 处理剩余像素
+    for(i = 0; i < remain; i++)
+    {
+        *data_addr = *color++;
+    }
+}
 
 
 /*********************end of file*************************/

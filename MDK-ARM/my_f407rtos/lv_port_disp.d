@@ -129,6 +129,7 @@ my_f407rtos\lv_port_disp.o: ..\Middlewares/Third_Party/LVGL/lvgl/src/extra/widge
 my_f407rtos\lv_port_disp.o: ..\Middlewares/Third_Party/LVGL/lvgl/src/extra/widgets/led/lv_led.h
 my_f407rtos\lv_port_disp.o: ..\Middlewares/Third_Party/LVGL/lvgl/src/extra/widgets/imgbtn/lv_imgbtn.h
 my_f407rtos\lv_port_disp.o: ..\Middlewares/Third_Party/LVGL/lvgl/src/extra/widgets/span/lv_span.h
+my_f407rtos\lv_port_disp.o: F:\Keli5 MDK\ARM\ARMCC\Bin\..\include\stdio.h
 my_f407rtos\lv_port_disp.o: ../Drivers/BSP_Driver/LCD/bsp_nt35510_lcd.h
 my_f407rtos\lv_port_disp.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h
 my_f407rtos\lv_port_disp.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h

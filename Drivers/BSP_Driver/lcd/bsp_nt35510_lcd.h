@@ -104,6 +104,7 @@ void 											LCD_SetBackColor								(uint16_t Color);
 void 											LCD_SetTextColor								(uint16_t Color)	;
 void 											LCD_SetColors										(uint16_t TextColor, uint16_t BackColor);
 void 											LCD_GetColors										(uint16_t *TextColor, uint16_t *BackColor);
+void                     NT35510_FillBlock              (uint16_t usX, uint16_t usY, uint16_t usWidth, uint16_t usHeight, uint16_t *color);
 
 #define 									LCD_ClearLine 						NT35510_ClearLine
 
